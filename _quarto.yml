@@ -2,6 +2,7 @@ project:
   type: book
 
 book:
+  page-navigation: true
   title: "Measurement Error"
   author: "Avery Maytin"
   date: "8/27/2024"

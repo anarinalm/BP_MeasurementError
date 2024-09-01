@@ -1,7 +1,99 @@
-# Summary
+# Download NHANES Data
 
-In summary, this book has no content whatsoever.
+Download the NHANES data using the nhanesA package:
+
+```{r include = FALSE}
+library(DT)
+library(dplyr)
+library(nhanesA)
+```
+
+## Identify Required Data Tables:
+
+Look at the diet, examination, and demographic info for the 2011-2012 cycle of NHANES
 
 ```{r}
-1 + 1
+#Note DR1TOT_G and DR2TOT_G
+datatable(nhanesTables('DIET', 2012))
+#Note BPX_G: Blood Pressure
+datatable(nhanesTables('EXAM', 2012))
+#Note DEMO_G: Demographic Info (the only table)
+datatable(nhanesTables('DEMO', 2012))
+```
+
+Now that we have identified the tables we need, take a look at the required variables
+
+```{r}
+datatable(nhanesTableVars('DIET', 'DR1TOT_G'))
+```
+
+We have identified the variables corresponding to each variable of interest:
+
+| Dietary Measure | Variable Name |
+|-----------------|---------------|
+| Sodium (mg)     | DR1TSODI      |
+| Potassium (mg)  | DR1TPOTA      |
+| Calcium (mg)    | DR1TCALC      |
+| Magnesium (mg)  | DR1TMAGN      |
+| Protein (gm)    | DR1TPROT      |
+| Alcohol (gm)    | DR1TALCO      |
+| Energy (kcal)   | DR1TKCAL      |
+
+Also include SEQN, which corresponds to to the respondent ID number.
+
+```{r}
+datatable(nhanesTableVars('EXAM', 'BPX_G'))
+```
+
+We are interested in BPXSY1 and BPXDI1 for systolic and diastolic blood pressure, respectively
+
+## Merge Data Together
+
+Take the diet data
+
+```{r}
+d1_diet_d <- nhanes('DR1TOT_G')
+d2_diet_d <- nhanes('DR2TOT_G')
+
+#concatenate the diet data for two days together
+diet_d <- merge(d1_diet_d, d2_diet_d, )
+datatable(head(diet_d))
+```
+
+Select Day 1 diet measures
+
+```{r}
+select_cols <- c('SEQN', 'DR1TSODI', 'DR1TPOTA', 'DR1TCALC', 'DR1TMAGN', 'DR1TPROT', 'DR1TALCO', 'DR1TKCAL')
+nutrients <- diet_d[, select_cols]
+datatable(head(nutrients))
+```
+
+```{r}
+demo <- nhanes('DEMO_G')
+head(demo)
+```
+
+Select Blood Pressure Measures
+
+```{r}
+BP_cols <- c('SEQN', 'BPXSY1','BPXDI1')
+BP_data <- nhanes('BPX_G')[, BP_cols]
+datatable(head(BP_data))
+```
+
+Combine all tables together:
+
+```{r}
+total_df <- merge(nutrients, BP_data, by = 'SEQN')
+#get rid of any column with NA
+total_df <- na.omit(total_df)
+
+total_df <- merge(total_df, demo)
+datatable(head(total_df))
+```
+
+```{r}
+all_v_diastolic_model = lm(formula = BPXDI1 ~ DR1TSODI + DR1TPOTA + DR1TCALC + DR1TMAGN + DR1TPROT + DR1TALCO + DR1TKCAL, data = total_df)
+
+summary(all_v_diastolic_model)
 ```
