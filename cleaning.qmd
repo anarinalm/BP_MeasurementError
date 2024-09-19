@@ -1,0 +1,257 @@
+# Data Examination
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(tibble)
+library(ggplot2)
+library(data.table)
+library(devtools)
+library(viridis)
+library(hrbrthemes)
+#using data specified in this github repository:
+install_github("jhs-hwg/cardioStatsUSA")
+library(cardioStatsUSA)
+```
+
+```{r}
+head(nhanes_data)
+print(nrow(nhanes_data))
+print(nrow(nhanes_data[svy_subpop_htn == 1]))
+```
+
+Following the example in <https://jhs-hwg.github.io/cardioStatsUSA/articles/replicate_nchs_2017.html>:
+
+```{r}
+# Make a copy here so that we don't modify the NHANES data
+# (doing so would break tests that are run after this one)
+nhanes_data_test <- copy(nhanes_data)
+# match the age groups of CDC report
+nhanes_data_test[
+ , demo_age_cat := cut(demo_age_years,
+                       breaks = c(18, 39, 59, Inf),
+                       labels = c("18-39", "40-59", "60+"),
+                       include.lowest = TRUE)
+]
+
+nhanes_data_test <- nhanes_data_test %>%
+ # exclude pregnant women
+ .[demo_pregnant == 'No' | is.na(demo_pregnant)] %>%
+ # exclude participants missing both SBP and DBP
+ .[!(is.na(bp_dia_mean) & is.na(bp_sys_mean))]
+
+print(paste0("n =", nrow(nhanes_data_test)))
+
+ds <- nhanes_data_test %>%
+ nhanes_design(
+  key = nhanes_key,
+  outcome_variable = 'htn_jnc7',
+  group_variable = 'demo_age_cat',
+  time_values = '2015-2016'
+ )
+
+print(ds)
+
+ds_standard <- ds %>%
+ nhanes_design_standardize(
+  standard_variable = 'demo_age_cat',
+  standard_weights = c(0.420263, 0.357202, 0.222535)
+ )
+```
+
+```{r}
+#nhanes_summarize(nhanes_data_test, nhanes_key, outcome_variable = "demo_age_cat")
+nhanes_visualize(
+  data = nhanes_data, 
+  key = nhanes_key, 
+  outcome_variable = "bp_sys_mean",
+  outcome_stats = 'mean',
+  standard_variable = "demo_age_cat", 
+  time_values = c("2013-2014", "2015-2016", "2017-2020"), 
+  group_variable = "demo_age_cat"
+  )
+
+nhanes_htn_subpop <- nhanes_data[nhanes_data$htn_accaha == "Yes", ]
+
+nhanes_visualize(
+  data = nhanes_htn_subpop, 
+  key = nhanes_key, 
+  outcome_variable = "bp_control_accaha",
+  outcome_stats = 'percentage',
+  standard_variable = "demo_age_cat", 
+  group_variable = "demo_gender"
+  )
+```
+
+```{r}
+nhanes_visualize(
+  data = nhanes_data, 
+  key = nhanes_key, 
+  outcome_variable = "bp_dia_mean",
+  outcome_stats = 'mean',
+  standard_variable = "demo_age_cat", 
+  group_variable = "demo_gender"
+  )
+```
+
+```{r}
+nhanes_data %>% drop_na(bp_dia_mean) %>%
+  ggplot(aes(x=bp_dia_mean, color=demo_age_cat)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Age")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_age_cat)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Age")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_race)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Race")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_gender)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Gender")
+
+nhanes_female <- nhanes_data[nhanes_data$demo_gender == "Women", ]
+nhanes_female %>% drop_na(demo_pregnant) %>% 
+    ggplot(aes(x=bp_sys_mean, color=demo_pregnant)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Pregnancy (Men Excluded)")
+
+nhanes_female %>% drop_na(demo_pregnant) %>% 
+    ggplot(aes(x=bp_dia_mean, color=demo_pregnant)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Pregnancy (Men Excluded)")
+```
+
+```{r}
+nhanes_data %>% drop_na(cc_smoke) %>%
+  ggplot(aes(x=cc_smoke, y=bp_sys_mean, fill=cc_smoke)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+#    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Smoking Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_bmi) %>%
+  ggplot(aes(x=cc_bmi, y=bp_sys_mean, fill=cc_bmi)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS BMI Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_cvd_chd) %>%
+  ggplot(aes(x=cc_cvd_chd, y=bp_sys_mean, fill=cc_cvd_chd)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Chronic Heart Disease Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_ckd) %>%
+  ggplot(aes(x=cc_ckd, y=bp_sys_mean, fill=cc_ckd)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Chronic Kidney Disease Status") +
+    xlab("")
+```
+
+```{r}
+nhanes_data %>% drop_na(cc_smoke) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_smoke)) +
+    geom_histogram(fill="white", alpha=0.5, bins= 80) +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    ggtitle("Blood Pressure with Smoking Histogram")
+
+nhanes_data %>% drop_na(cc_bmi) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_bmi)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with BMI Histogram")
+
+nhanes_data %>% drop_na(cc_cvd_stroke) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_cvd_stroke)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Smoking Histogram")
+
+nhanes_data %>% drop_na(cc_diabetes) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_diabetes)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Diabetes Histogram")
+```
+
+```{r}
+#Chi Squared Tests
+
+#Body Mass Index
+nhanes_bmi_df <- nhanes_data %>% select(htn_accaha, cc_bmi) %>% drop_na(cc_bmi)
+nhanes_bmi_df <- table(nhanes_bmi_df$htn_accaha, nhanes_bmi_df$cc_bmi)
+nhanes_bmi_df
+chisq.test(nhanes_bmi_df)
+
+#Smoking 
+nhanes_smoke_df <- nhanes_data %>% select(htn_accaha, cc_smoke) %>% drop_na(cc_smoke)
+nhanes_smoke_df <- table(nhanes_smoke_df$htn_accaha, nhanes_smoke_df$cc_smoke)
+nhanes_smoke_df
+chisq.test(nhanes_smoke_df)
+
+#Chronic Heart Disease
+nhanes_chd_df <- nhanes_data %>% select(htn_accaha, cc_cvd_chd) %>% drop_na(cc_cvd_chd)
+nhanes_chd_df <- table(nhanes_chd_df$htn_accaha, nhanes_chd_df$cc_cvd_chd)
+nhanes_chd_df
+chisq.test(nhanes_chd_df)
+
+#Chronic Kidney Disease
+nhanes_ckd_df <- nhanes_data %>% select(htn_accaha, cc_ckd) %>% drop_na(cc_ckd)
+nhanes_ckd_df <- table(nhanes_ckd_df$htn_accaha, nhanes_ckd_df$cc_ckd)
+nhanes_ckd_df
+chisq.test(nhanes_ckd_df)
+```
+
+```{r}
+#Don't know if this is the idea but:
+nhanes_dia_df <- nhanes_data %>% select(htn_accaha, bp_dia_mean) %>% drop_na(bp_dia_mean)
+nhanes_dia_df 
+t_test <- t.test(bp_dia_mean ~ htn_accaha, data=nhanes_dia_df)
+t_test
+
+#Smoking T Test (Excludes Former):
+nhanes_sys_smoke <- nhanes_data[nhanes_data$cc_smoke != "Former", ] %>% select(cc_smoke, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_smoke)
+smoke_test <- t.test(bp_sys_mean ~ cc_smoke, data = nhanes_sys_smoke)
+smoke_test
+
+#BMI T Test (Compares <25 and 35+):
+nhanes_sys_bmi <- nhanes_data[nhanes_data$cc_bmi %in% c("<25", "35+"), ] %>% select(cc_bmi, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_bmi)
+bmi_test <- t.test(bp_sys_mean ~ cc_bmi, data = nhanes_sys_bmi)
+bmi_test
+
+#Diabetes T Test:
+nhanes_sys_diabetes <- nhanes_data %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean ~ cc_diabetes, data = nhanes_sys_diabetes)
+diabetes_test
+```
+
+```{r}
+#Code for model analysis will go here:
+```

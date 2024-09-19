@@ -1,4 +1,4 @@
-# Download NHANES Data
+# Preparing the NHANES Data
 
 Download the NHANES data using the nhanesA package:
 
@@ -8,26 +8,28 @@ library(dplyr)
 library(nhanesA)
 ```
 
-## Identify Required Data Tables:
+## Identify Data Tables of Interest
 
 Look at the diet, examination, and demographic info for the 2011-2012 cycle of NHANES
 
 ```{r}
 #Note DR1TOT_G and DR2TOT_G
 datatable(nhanesTables('DIET', 2012))
-#Note BPX_G: Blood Pressure
+#Note BPX_G: Blood Pressure (may also need BMX_G/body measures)
 datatable(nhanesTables('EXAM', 2012))
 #Note DEMO_G: Demographic Info (the only table)
 datatable(nhanesTables('DEMO', 2012))
 ```
 
-Now that we have identified the tables we need, take a look at the required variables
+## Identify Variables of Interest
+
+Now that we have identified the tables we need, first take a look at the required variables in the table of dietary information:
 
 ```{r}
 datatable(nhanesTableVars('DIET', 'DR1TOT_G'))
 ```
 
-We have identified the variables corresponding to each variable of interest:
+We can then identify the variables corresponding to each dietary measure of interest:
 
 | Dietary Measure | Variable Name |
 |-----------------|---------------|
@@ -39,7 +41,9 @@ We have identified the variables corresponding to each variable of interest:
 | Alcohol (gm)    | DR1TALCO      |
 | Energy (kcal)   | DR1TKCAL      |
 
-Also include SEQN, which corresponds to to the respondent ID number.
+We will also need to include SEQN, which corresponds to to the respondent ID number. This will be the column used for combining the different tables together.
+
+Let's next look at the variables in the blood pressure table:
 
 ```{r}
 datatable(nhanesTableVars('EXAM', 'BPX_G'))
@@ -49,7 +53,7 @@ We are interested in BPXSY1 and BPXDI1 for systolic and diastolic blood pressure
 
 ## Merge Data Together
 
-Take the diet data
+Take the diet data: there are two separate tables for measurements taken on different days. We can combine this using the merge() function.
 
 ```{r}
 d1_diet_d <- nhanes('DR1TOT_G')
@@ -60,7 +64,7 @@ diet_d <- merge(d1_diet_d, d2_diet_d, )
 datatable(head(diet_d))
 ```
 
-Select Day 1 diet measures
+For this example, we take only the day 1 diet measures to create the "nutrients" dataframe:
 
 ```{r}
 select_cols <- c('SEQN', 'DR1TSODI', 'DR1TPOTA', 'DR1TCALC', 'DR1TMAGN', 'DR1TPROT', 'DR1TALCO', 'DR1TKCAL')
@@ -70,10 +74,10 @@ datatable(head(nutrients))
 
 ```{r}
 demo <- nhanes('DEMO_G')
-head(demo)
+datatable(head(demo))
 ```
 
-Select Blood Pressure Measures
+Simliarly, we select the systolic and diastolic blood pressure measures from the blood pressure table 'BPX_G':
 
 ```{r}
 BP_cols <- c('SEQN', 'BPXSY1','BPXDI1')
@@ -92,8 +96,13 @@ total_df <- merge(total_df, demo)
 datatable(head(total_df))
 ```
 
+This one uses all the variables (but have to adjust for collinearity)
+
 ```{r}
 all_v_diastolic_model = lm(formula = BPXDI1 ~ DR1TSODI + DR1TPOTA + DR1TCALC + DR1TMAGN + DR1TPROT + DR1TALCO + DR1TKCAL, data = total_df)
 
 summary(all_v_diastolic_model)
 ```
+
+Note for later:\
+Can use the save(dataframe, "file_name.Rdata") function and then in another qmd file load using load("file_name.Rdata")
