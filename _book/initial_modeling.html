@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Measurement Error - 4&nbsp; Modeling Diabetes Occurence</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./diagnostics.html" rel="next">
+<link href="./visualization.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./initial_modeling.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurence</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Measurement Error</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Preparing the NHANES Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Data Examination</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./initial_modeling.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurence</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Model Diagnostics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#simple-diabetes-modeling" id="toc-simple-diabetes-modeling" class="nav-link active" data-scroll-target="#simple-diabetes-modeling"><span class="header-section-number">4.1</span> Simple Diabetes Modeling</a></li>
+  <li><a href="#demographic-model" id="toc-demographic-model" class="nav-link" data-scroll-target="#demographic-model"><span class="header-section-number">4.2</span> Demographic Model</a></li>
+  <li><a href="#full-model" id="toc-full-model" class="nav-link" data-scroll-target="#full-model"><span class="header-section-number">4.3</span> Full Model</a></li>
+  <li><a href="#model-selection" id="toc-model-selection" class="nav-link" data-scroll-target="#model-selection"><span class="header-section-number">4.4</span> Model Selection</a>
+  <ul class="collapse">
+  <li><a href="#forward-backward-selection" id="toc-forward-backward-selection" class="nav-link" data-scroll-target="#forward-backward-selection"><span class="header-section-number">4.4.1</span> Forward-Backward Selection</a></li>
+  </ul></li>
+  <li><a href="#model-diagnostics" id="toc-model-diagnostics" class="nav-link" data-scroll-target="#model-diagnostics"><span class="header-section-number">5</span> Model Diagnostics</a>
+  <ul class="collapse">
+  <li><a href="#likelihood-ratio-test" id="toc-likelihood-ratio-test" class="nav-link" data-scroll-target="#likelihood-ratio-test"><span class="header-section-number">5.1</span> Likelihood Ratio Test</a></li>
+  <li><a href="#model-fit" id="toc-model-fit" class="nav-link" data-scroll-target="#model-fit"><span class="header-section-number">5.2</span> Model Fit</a></li>
+  <li><a href="#calibration-plot" id="toc-calibration-plot" class="nav-link" data-scroll-target="#calibration-plot"><span class="header-section-number">5.3</span> Calibration Plot</a></li>
+  <li><a href="#homsler-lemeshow-test" id="toc-homsler-lemeshow-test" class="nav-link" data-scroll-target="#homsler-lemeshow-test"><span class="header-section-number">5.4</span> Homsler-Lemeshow Test</a></li>
+  <li><a href="#roc-curve" id="toc-roc-curve" class="nav-link" data-scroll-target="#roc-curve"><span class="header-section-number">5.5</span> ROC Curve</a></li>
+  <li><a href="#residuals-histogram" id="toc-residuals-histogram" class="nav-link" data-scroll-target="#residuals-histogram"><span class="header-section-number">5.6</span> Residuals Histogram</a></li>
+  <li><a href="#ignore" id="toc-ignore" class="nav-link" data-scroll-target="#ignore"><span class="header-section-number">5.7</span> Ignore///</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurence</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hrbrthemes)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#using data specified in this github repository:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"jhs-hwg/cardioStatsUSA"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cardioStatsUSA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="simple-diabetes-modeling" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="simple-diabetes-modeling"><span class="header-section-number">4.1</span> Simple Diabetes Modeling</h2>
+<p>We are choosing Diabetes as the co-morbidity for modeling. We will try to predict the occurrence of diabetes as a function of blood pressure as well as other covariates.</p>
+<p>The most basic model possible is a simple logistic regression model predicting diabetes status based on blood pressure:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>simple_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean, <span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cc_diabetes ~ bp_sys_mean, family = binomial, data = nhanes_data)
+
+Coefficients:
+              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -4.9404827  0.0770324  -64.14   &lt;2e-16 ***
+bp_sys_mean  0.0238141  0.0005811   40.98   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 43614  on 56533  degrees of freedom
+Residual deviance: 41987  on 56532  degrees of freedom
+  (3265 observations deleted due to missingness)
+AIC: 41991
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">tidy</span>(simple_diab_model_sys, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>), <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.077</td>
+<td style="text-align: right;">-64.135</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.008</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bp_sys_mean</td>
+<td style="text-align: right;">1.024</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">40.982</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.023</td>
+<td style="text-align: right;">1.025</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>simple_diab_model_dia <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_dia_mean, <span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_diab_model_dia)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cc_diabetes ~ bp_dia_mean, family = binomial, data = nhanes_data)
+
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -1.652673   0.073728 -22.416  &lt; 2e-16 ***
+bp_dia_mean -0.003651   0.001039  -3.514 0.000441 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 43309  on 56285  degrees of freedom
+Residual deviance: 43297  on 56284  degrees of freedom
+  (3513 observations deleted due to missingness)
+AIC: 43301
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">tidy</span>(simple_diab_model_dia, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>), <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.192</td>
+<td style="text-align: right;">0.074</td>
+<td style="text-align: right;">-22.416</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.166</td>
+<td style="text-align: right;">0.221</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bp_dia_mean</td>
+<td style="text-align: right;">0.996</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">-3.514</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.994</td>
+<td style="text-align: right;">0.998</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="model-explanation" class="level4" data-number="4.1.0.1">
+<h4 data-number="4.1.0.1" class="anchored" data-anchor-id="model-explanation"><span class="header-section-number">4.1.0.1</span> Model Explanation:</h4>
+<p>For the logistic regression using systolic blood pressure, we can see that the odds ratio beta parameter is 1.024. This implies that a higher systolic blood pressure corresponds to increased chances of observing diabetes.</p>
+<p>A more exact interpretation would be that: for one additional unit increase in systolic blood pressure, the estimated risk of having diabetes increases by 2.4%.</p>
+<p>This value may not seem extremely high, yet it still has a p value evaluated to be 0 by R. We can also see that the 95% confidence interval of this parameter ranges between 1.0229 and 1.0253, meaning that the model predicts that the true relationship falls within this interval with a 95% certainty, since the true value of the parameter is most likely within this interval.</p>
+<p>The opposite is true with diastolic blood pressure: the beta parameter is 0.996, implying that higher diastolic blood pressure corresponds to a lower chance of observing diabetes. For an additional unit increase in diastolic blood pressure, the estimated risk of having diabetes decreases by 0.04%.</p>
+<p>Note: systolic blood pressure is a better predictor of cardiovascular disease, so I chose to consider systolic rather than diastolic in future models.</p>
+</section>
+</section>
+<section id="demographic-model" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="demographic-model"><span class="header-section-number">4.2</span> Demographic Model</h2>
+<p>Next, we build a model including the demographic variables as well. This will hopefully provide a more accurate model, since it will have access to the further information in order to make predictions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>demo_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender,<span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span> (demo_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + 
+    demo_gender, family = binomial, data = nhanes_data)
+
+Coefficients:
+                              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                 -5.6927561  0.0885174 -64.312  &lt; 2e-16 ***
+bp_sys_mean                  0.0037581  0.0006792   5.533 3.14e-08 ***
+demo_age_years               0.0529545  0.0009161  57.806  &lt; 2e-16 ***
+demo_raceNon-Hispanic Black  0.9034242  0.0350353  25.786  &lt; 2e-16 ***
+demo_raceNon-Hispanic Asian  0.8093210  0.0606852  13.336  &lt; 2e-16 ***
+demo_raceHispanic            0.8592775  0.0343392  25.023  &lt; 2e-16 ***
+demo_raceOther               0.7478892  0.0718834  10.404  &lt; 2e-16 ***
+demo_genderWomen            -0.1547613  0.0265581  -5.827 5.63e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 43614  on 56533  degrees of freedom
+Residual deviance: 37780  on 56526  degrees of freedom
+  (3265 observations deleted due to missingness)
+AIC: 37796
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">tidy</span>(demo_diab_model_sys, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>), <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.089</td>
+<td style="text-align: right;">-64.312</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.004</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bp_sys_mean</td>
+<td style="text-align: right;">1.004</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">5.533</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">1.005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_age_years</td>
+<td style="text-align: right;">1.054</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">57.806</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.052</td>
+<td style="text-align: right;">1.056</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_raceNon-Hispanic Black</td>
+<td style="text-align: right;">2.468</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">25.786</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2.304</td>
+<td style="text-align: right;">2.643</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_raceNon-Hispanic Asian</td>
+<td style="text-align: right;">2.246</td>
+<td style="text-align: right;">0.061</td>
+<td style="text-align: right;">13.336</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.993</td>
+<td style="text-align: right;">2.528</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_raceHispanic</td>
+<td style="text-align: right;">2.361</td>
+<td style="text-align: right;">0.034</td>
+<td style="text-align: right;">25.023</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2.208</td>
+<td style="text-align: right;">2.526</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_raceOther</td>
+<td style="text-align: right;">2.113</td>
+<td style="text-align: right;">0.072</td>
+<td style="text-align: right;">10.404</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.832</td>
+<td style="text-align: right;">2.429</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_genderWomen</td>
+<td style="text-align: right;">0.857</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">-5.827</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.813</td>
+<td style="text-align: right;">0.902</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="model-explanation-1" class="level4" data-number="4.2.0.1">
+<h4 data-number="4.2.0.1" class="anchored" data-anchor-id="model-explanation-1"><span class="header-section-number">4.2.0.1</span> Model Explanation</h4>
+<p>In this model, we can still see a slight upwards trend with systolic blood pressure, although it is a bit weaker (1.024 &gt; 1.003). With this parameter, the estimated risk of having diabetes increases only by 0.3%. Although the effect is smaller, we can see that the confidence interval is between 1.0024 and 1.0051, which does not include 1. So, although small, the positive relationship is most likely significant.</p>
+</section>
+<section id="demographics" class="level4" data-number="4.2.0.2">
+<h4 data-number="4.2.0.2" class="anchored" data-anchor-id="demographics"><span class="header-section-number">4.2.0.2</span> Demographics</h4>
+<p><strong>Age:</strong></p>
+<p>The model also tells us that age is positively correlated with the observation of diabetes. With a log odds ratio of 1.054, it seems that every year increases the risk of diabetes occurrence by 5.4%.</p>
+<p><strong>Race:</strong></p>
+<p>The log odds ratio for categorical variables compares the other variables to the baseline “reference group”. Here, the “reference group” for the race variable is Non-Hispanic White. We can see that, in comparison to this group, all other races have significantly higher risk of diabetes: for example, the Hispanic population’s risk of diabetes occurrence is 2.36 times higher than the Non-Hispanic White population.</p>
+<p><strong>Gender:</strong></p>
+<p>With this variable, the reference group is men. We can see that women have a lower odds of having diabetes compared to men. Specifically, the risk of diabetes in women is about 85.6% of that of men.</p>
+</section>
+</section>
+<section id="full-model" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="full-model"><span class="header-section-number">4.3</span> Full Model</h2>
+<p>Lastly, we want to create a model including confounding variables. To achieve this, we must first determine which other variables are confounding, meaning they have significant associations with diabetes.</p>
+<p>We can achieve this by using chi squared test, which compares whether or not the observed ratios of diabetes and confounding variables matches the ratios expected by random chance. If the chi squared test determines significance, then diabetes and the other variables commonly occur together and therefore are confounding.</p>
+<section id="perform-chi-squared-tests" class="level4" data-number="4.3.0.1">
+<h4 data-number="4.3.0.1" class="anchored" data-anchor-id="perform-chi-squared-tests"><span class="header-section-number">4.3.0.1</span> Perform Chi Squared Tests:</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing for BMI</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>nhanes_bmi_diab <span class="ot">&lt;-</span> nhanes_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(cc_diabetes, cc_bmi) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(cc_bmi) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(cc_diabetes)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>nhanes_bmi_diab <span class="ot">&lt;-</span> <span class="fu">table</span>(nhanes_bmi_diab)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanes_bmi_diab</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(nhanes_bmi_diab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's Chi-squared test
+
+data:  nhanes_bmi_diab
+X-squared = 2368.3, df = 3, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing for Smoking</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>nhanes_smoke_diab <span class="ot">&lt;-</span> nhanes_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(cc_diabetes, cc_smoke) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(cc_smoke) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(cc_diabetes)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>nhanes_smoke_diab <span class="ot">&lt;-</span> <span class="fu">table</span>(nhanes_smoke_diab)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanes_smoke_diab</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(nhanes_smoke_diab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's Chi-squared test
+
+data:  nhanes_smoke_diab
+X-squared = 435.81, df = 2, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing for Hypertensive Medication use</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nhanes_med_diab <span class="ot">&lt;-</span> nhanes_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(cc_diabetes, bp_med_use) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(bp_med_use) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(cc_diabetes)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>nhanes_med_diab <span class="ot">&lt;-</span> <span class="fu">table</span>(nhanes_med_diab)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanes_med_diab</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(nhanes_med_diab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's Chi-squared test with Yates' continuity correction
+
+data:  nhanes_med_diab
+X-squared = 5807.1, df = 1, p-value &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>After this analysis, we can see that all three variables, BMI, Smoking, and Medication Use, are all confounding. We can include all of them in the next model, in addition to systolic blood pressure and the demographic variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#to prevent errors down the line, exclude the rows with na:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>used_vars <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'cc_diabetes'</span>, <span class="st">'bp_sys_mean'</span>, <span class="st">'demo_age_years'</span>, <span class="st">'demo_race'</span>, <span class="st">'demo_gender'</span>, <span class="st">'cc_bmi'</span>, <span class="st">'cc_smoke'</span>, <span class="st">'bp_med_use'</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="ot">&lt;-</span> nhanes_data[<span class="fu">complete.cases</span>(nhanes_data[,..used_vars]), ]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>full_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender<span class="sc">+</span> cc_bmi <span class="sc">+</span> cc_smoke <span class="sc">+</span> bp_med_use, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + 
+    demo_gender + cc_bmi + cc_smoke + bp_med_use, family = binomial, 
+    data = clean_nhanes)
+
+Coefficients:
+                              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                 -6.3003463  0.1112295 -56.643  &lt; 2e-16 ***
+bp_sys_mean                  0.0017066  0.0007373   2.315   0.0206 *  
+demo_age_years               0.0470354  0.0011312  41.579  &lt; 2e-16 ***
+demo_raceNon-Hispanic Black  0.6987360  0.0374745  18.646  &lt; 2e-16 ***
+demo_raceNon-Hispanic Asian  1.3022903  0.0660355  19.721  &lt; 2e-16 ***
+demo_raceHispanic            0.8889260  0.0366792  24.235  &lt; 2e-16 ***
+demo_raceOther               0.8913458  0.0763522  11.674  &lt; 2e-16 ***
+demo_genderWomen            -0.3082492  0.0295124 -10.445  &lt; 2e-16 ***
+cc_bmi25 to &lt;30              0.5927344  0.0444524  13.334  &lt; 2e-16 ***
+cc_bmi30 to &lt;35              1.1736075  0.0463565  25.317  &lt; 2e-16 ***
+cc_bmi35+                    1.7702868  0.0480051  36.877  &lt; 2e-16 ***
+cc_smokeFormer               0.0614704  0.0335729   1.831   0.0671 .  
+cc_smokeCurrent              0.1853436  0.0403687   4.591 4.41e-06 ***
+bp_med_useYes                0.9121351  0.0314064  29.043  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 41278  on 52196  degrees of freedom
+Residual deviance: 33055  on 52183  degrees of freedom
+AIC: 33083
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">tidy</span>(full_diab_model_sys, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>), <span class="at">digits =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.002</td>
+<td style="text-align: right;">0.111</td>
+<td style="text-align: right;">-56.643</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">0.002</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bp_sys_mean</td>
+<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">2.315</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">1.003</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_age_years</td>
+<td style="text-align: right;">1.048</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">41.579</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.046</td>
+<td style="text-align: right;">1.050</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_raceNon-Hispanic Black</td>
+<td style="text-align: right;">2.011</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">18.646</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.869</td>
+<td style="text-align: right;">2.164</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_raceNon-Hispanic Asian</td>
+<td style="text-align: right;">3.678</td>
+<td style="text-align: right;">0.066</td>
+<td style="text-align: right;">19.721</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">3.229</td>
+<td style="text-align: right;">4.183</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_raceHispanic</td>
+<td style="text-align: right;">2.433</td>
+<td style="text-align: right;">0.037</td>
+<td style="text-align: right;">24.235</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">2.264</td>
+<td style="text-align: right;">2.614</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">demo_raceOther</td>
+<td style="text-align: right;">2.438</td>
+<td style="text-align: right;">0.076</td>
+<td style="text-align: right;">11.674</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">2.096</td>
+<td style="text-align: right;">2.828</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">demo_genderWomen</td>
+<td style="text-align: right;">0.735</td>
+<td style="text-align: right;">0.030</td>
+<td style="text-align: right;">-10.445</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.693</td>
+<td style="text-align: right;">0.778</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cc_bmi25 to &lt;30</td>
+<td style="text-align: right;">1.809</td>
+<td style="text-align: right;">0.044</td>
+<td style="text-align: right;">13.334</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.659</td>
+<td style="text-align: right;">1.974</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cc_bmi30 to &lt;35</td>
+<td style="text-align: right;">3.234</td>
+<td style="text-align: right;">0.046</td>
+<td style="text-align: right;">25.317</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">2.954</td>
+<td style="text-align: right;">3.542</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cc_bmi35+</td>
+<td style="text-align: right;">5.873</td>
+<td style="text-align: right;">0.048</td>
+<td style="text-align: right;">36.877</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">5.347</td>
+<td style="text-align: right;">6.454</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cc_smokeFormer</td>
+<td style="text-align: right;">1.063</td>
+<td style="text-align: right;">0.034</td>
+<td style="text-align: right;">1.831</td>
+<td style="text-align: right;">0.067</td>
+<td style="text-align: right;">0.996</td>
+<td style="text-align: right;">1.136</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cc_smokeCurrent</td>
+<td style="text-align: right;">1.204</td>
+<td style="text-align: right;">0.040</td>
+<td style="text-align: right;">4.591</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.112</td>
+<td style="text-align: right;">1.302</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bp_med_useYes</td>
+<td style="text-align: right;">2.490</td>
+<td style="text-align: right;">0.031</td>
+<td style="text-align: right;">29.043</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">2.341</td>
+<td style="text-align: right;">2.648</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="model-explanation-2" class="level4" data-number="4.3.0.2">
+<h4 data-number="4.3.0.2" class="anchored" data-anchor-id="model-explanation-2"><span class="header-section-number">4.3.0.2</span> Model Explanation</h4>
+<p>The previous variables in this model continue to show the same patterns, although again, the effect of systolic blood pressure is again reduced due to a lower log odds ratio. Now, the p value seems to be much higher at 0.02 (which is still significant, but much less so). The demographic variables also have much the same pattern, although Non-Hispanic Asians seem to have a much higher odds ratio than in the previous model.</p>
+</section>
+<section id="covariates" class="level4" data-number="4.3.0.3">
+<h4 data-number="4.3.0.3" class="anchored" data-anchor-id="covariates"><span class="header-section-number">4.3.0.3</span> Covariates</h4>
+<p><strong>BMI</strong>:</p>
+<p>In this variable, the baseline reference level is bmi &lt;25. In comparison, those with higher bmi have increased risk of having diabetes, with the risk increasing the higher the bmi becomes. For example, those with bmi from 25-30 have a 1.8 times higher risk, while those with a bmi of 35+ have a 5.8 times higher risk.</p>
+<p><strong>Smoking:</strong></p>
+<p>With a baseline level of nonsmoking, former smokers may have about a 6% higher risk of diabetes. This may not be significant, however, given that the p value is only 0.067 and the odds ratio of 1 falls within the confidence interval. Current smokers, on the other hand, have about a 20% higher risk, this time with a much lower p value of 4*10^-6</p>
+<p><strong>Blood Pressure Medication Use</strong>:</p>
+<p>Compared to those who do not use blood pressure medication, individuals who do have about a 2.5 times higher risk of experiencing diabetes.</p>
+</section>
+</section>
+<section id="model-selection" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="model-selection"><span class="header-section-number">4.4</span> Model Selection</h2>
+<p>It is possible to find an even better model by modifying which variables we include in our logistic regression model. We can achieve this using model selection, which will selectively add or subtract our explanatory variables from the model and evaluate its performance to choose the final best set of variables.</p>
+<p>Explanation of model selection and or AIC?</p>
+<section id="backwards-selection" class="level4" data-number="4.4.0.1">
+<h4 data-number="4.4.0.1" class="anchored" data-anchor-id="backwards-selection"><span class="header-section-number">4.4.0.1</span> Backwards Selection:</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>backwards <span class="ot">=</span> <span class="fu">step</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=33082.55
+cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender + 
+    cc_bmi + cc_smoke + bp_med_use
+
+                 Df Deviance   AIC
+&lt;none&gt;                 33055 33083
+- bp_sys_mean     1    33060 33086
+- cc_smoke        2    33076 33100
+- demo_gender     1    33164 33190
+- bp_med_use      1    33909 33935
+- demo_race       4    33930 33950
+- cc_bmi          3    34756 34778
+- demo_age_years  1    34931 34957</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">formula</span>(backwards)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender + 
+    cc_bmi + cc_smoke + bp_med_use</code></pre>
+</div>
+</div>
+<p>It looks like the backwards selection model returned the same full model. In other words, removing variables does not improve its AIC, and therefore does not improve its performance.</p>
+</section>
+<section id="forward-selection" class="level4" data-number="4.4.0.2">
+<h4 data-number="4.4.0.2" class="anchored" data-anchor-id="forward-selection"><span class="header-section-number">4.4.0.2</span> Forward Selection</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#start from a model without any predictors</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>nothing <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> clean_nhanes, <span class="at">family=</span>binomial)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(nothing)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cc_diabetes ~ 1, family = binomial, data = clean_nhanes)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -1.85919    0.01282  -145.1   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 41278  on 52196  degrees of freedom
+Residual deviance: 41278  on 52196  degrees of freedom
+AIC: 41280
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>forwards <span class="ot">=</span> <span class="fu">step</span>(nothing,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="fu">formula</span>(nothing),<span class="at">upper=</span><span class="fu">formula</span>(full_diab_model_sys)), <span class="at">direction=</span><span class="st">"forward"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=41279.9
+cc_diabetes ~ 1
+
+                 Df Deviance   AIC
++ bp_med_use      1    37076 37080
++ demo_age_years  1    37252 37256
++ cc_bmi          3    39218 39226
++ bp_sys_mean     1    39888 39892
++ demo_race       4    40891 40901
++ cc_smoke        2    40911 40917
++ demo_gender     1    41242 41246
+&lt;none&gt;                 41278 41280
+
+Step:  AIC=37079.85
+cc_diabetes ~ bp_med_use
+
+                 Df Deviance   AIC
++ demo_age_years  1    35675 35681
++ cc_bmi          3    35907 35917
++ demo_race       4    36597 36609
++ bp_sys_mean     1    36788 36794
++ cc_smoke        2    36968 36976
++ demo_gender     1    37009 37015
+&lt;none&gt;                 37076 37080
+
+Step:  AIC=35681.48
+cc_diabetes ~ bp_med_use + demo_age_years
+
+              Df Deviance   AIC
++ cc_bmi       3    34070 34082
++ demo_race    4    34834 34848
++ demo_gender  1    35624 35632
++ bp_sys_mean  1    35654 35662
++ cc_smoke     2    35670 35680
+&lt;none&gt;              35675 35681
+
+Step:  AIC=34082.43
+cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi
+
+              Df Deviance   AIC
++ demo_race    4    33213 33233
++ demo_gender  1    33963 33977
++ bp_sys_mean  1    34050 34064
++ cc_smoke     2    34054 34070
+&lt;none&gt;              34070 34082
+
+Step:  AIC=33232.52
+cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi + demo_race
+
+              Df Deviance   AIC
++ demo_gender  1    33081 33103
++ cc_smoke     2    33170 33194
++ bp_sys_mean  1    33208 33230
+&lt;none&gt;              33213 33233
+
+Step:  AIC=33102.89
+cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi + demo_race + 
+    demo_gender
+
+              Df Deviance   AIC
++ cc_smoke     2    33060 33086
++ bp_sys_mean  1    33076 33100
+&lt;none&gt;              33081 33103
+
+Step:  AIC=33085.88
+cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi + demo_race + 
+    demo_gender + cc_smoke
+
+              Df Deviance   AIC
++ bp_sys_mean  1    33055 33083
+&lt;none&gt;              33060 33086
+
+Step:  AIC=33082.55
+cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi + demo_race + 
+    demo_gender + cc_smoke + bp_sys_mean</code></pre>
+</div>
+</div>
+<p>The Forward Selection process again selects the full model.</p>
+</section>
+<section id="forward-backward-selection" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="forward-backward-selection"><span class="header-section-number">4.4.1</span> Forward-Backward Selection</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bothways <span class="ot">=</span> <span class="fu">step</span>(nothing, <span class="fu">list</span>(<span class="at">lower=</span><span class="fu">formula</span>(nothing),<span class="at">upper=</span><span class="fu">formula</span>(full_diab_model_sys)),</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="at">direction=</span><span class="st">"both"</span>,<span class="at">trace=</span><span class="dv">0</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">formula</span>(bothways)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cc_diabetes ~ bp_med_use + demo_age_years + cc_bmi + demo_race + 
+    demo_gender + cc_smoke + bp_sys_mean</code></pre>
+</div>
+</div>
+<p>The Forward-Backward algorithm also selects all of the variables.</p>
+<p>In this case, the best model (as determined by the AIC) includes all of the variables (systolic blood pressure, age, race, sex, smoking status, BMI, and medication use). In other situations, it may have returned just a few of these variables, but for this example, we can proceed with the full model.</p>
+</section>
+</section>
+<section id="model-diagnostics" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Model Diagnostics</h1>
+<p>The next step will be to evaluate the model to determine its _____.</p>
+<section id="likelihood-ratio-test" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="likelihood-ratio-test"><span class="header-section-number">5.1</span> Likelihood Ratio Test</h2>
+</section>
+<section id="model-fit" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="model-fit"><span class="header-section-number">5.2</span> Model Fit</h2>
+</section>
+<section id="calibration-plot" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="calibration-plot"><span class="header-section-number">5.3</span> Calibration Plot</h2>
+</section>
+<section id="homsler-lemeshow-test" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="homsler-lemeshow-test"><span class="header-section-number">5.4</span> Homsler-Lemeshow Test</h2>
+</section>
+<section id="roc-curve" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="roc-curve"><span class="header-section-number">5.5</span> ROC Curve</h2>
+</section>
+<section id="residuals-histogram" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="residuals-histogram"><span class="header-section-number">5.6</span> Residuals Histogram</h2>
+</section>
+<section id="ignore" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="ignore"><span class="header-section-number">5.7</span> Ignore///</h2>
+<p>I followed a guide online but I don’t really know what this is doing:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"demo_age_years"</span>]<span class="sc">*</span>demo_age_years <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> demo_age_years, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'
+`geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="initial_modeling_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"bp_sys_mean"</span>]<span class="sc">*</span>bp_sys_mean <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> bp_sys_mean, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'
+`geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="initial_modeling_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Test for Multicollinearity</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   GVIF Df GVIF^(1/(2*Df))
+bp_sys_mean    1.169212  1        1.081301
+demo_age_years 1.528167  1        1.236191
+demo_race      1.207663  4        1.023866
+demo_gender    1.091056  1        1.044536
+cc_bmi         1.182024  3        1.028263
+cc_smoke       1.173951  2        1.040908
+bp_med_use     1.235766  1        1.111650</code></pre>
+</div>
+</div>
+<p>Outliers</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="ot">&lt;-</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dffits =</span> <span class="fu">dffits</span>(full_diab_model_sys))</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">obs_number =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">large =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(dffits) <span class="sc">&gt;</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)),</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"red"</span>, <span class="st">"black"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(obs_number, dffits, <span class="at">color =</span> large)) <span class="sc">+</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="sc">*</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="initial_modeling_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./visualization.html" class="pagination-link" aria-label="Data Examination">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Data Examination</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./diagnostics.html" class="pagination-link" aria-label="Model Diagnostics">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Model Diagnostics</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
