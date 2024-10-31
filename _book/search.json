@@ -338,5 +338,75 @@
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Modeling Diabetes Occurence</span>"
     ]
+  },
+  {
+    "objectID": "diagnostics.html",
+    "href": "diagnostics.html",
+    "title": "5  Model Diagnostics",
+    "section": "",
+    "text": "5.1 Likelihood Ratio Test\nThe likelihood ratio test involves comparing whether two models are significantly different. Here, we will compare our full model with the null model (no covariates):\nThe null hypothesis is that there is no significant difference between the null model \\(H_0\\) and the full model \\(H_1\\).\nThe test compares the predicted likelihood of an observed outcome under the null model vs the predicted likelihood of the outcome under the model. In this case, the outcome will be diabetes. The test statistic will be calculated \\(\\lambda = -2 log(\\frac{L(H_0)}{L(H_1)})\\), where L denotes the likelihood of diabetes evaluated under each model. If the likelihood is much higher in the full model than in the null model, it means that additional parameters improve the model fit. As a result, \\(\\lambda\\) and its corresponding p value will be a much smaller, providing stronger evidence that we may need to reject the null hypothesis.\nlrtest(full_diab_model_sys, null_model)\n\n\n\n\n\n#Df\nLogLik\nDf\nChisq\nPr(&gt;Chisq)\n\n\n\n\n14\n-16527.27\nNA\nNA\nNA\n\n\n1\n-20638.95\n-13\n8223.36\n0\nAs expected, we can see that the full model is significant compared to the null hypothesis. We can also compare it to the simple model which uses only systolic blood pressure as a variable.\nlrtest(full_diab_model_sys, simple_diab_model_sys)\n\n\n\n\n\n#Df\nLogLik\nDf\nChisq\nPr(&gt;Chisq)\n\n\n\n\n14\n-16527.27\nNA\nNA\nNA\n\n\n2\n-19943.85\n-12\n6833.152\n0",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#model-fit",
+    "href": "diagnostics.html#model-fit",
+    "title": "5  Model Diagnostics",
+    "section": "5.2 Model Fit",
+    "text": "5.2 Model Fit\n\npred_probs &lt;- predict(full_diab_model_sys, type=\"response\")\npred_ys &lt;- ifelse(pred_probs &gt;0.5, 1, 0)\nclean_nhanes$cc_diabetes_num &lt;- ifelse(clean_nhanes$cc_diabetes == \"Yes\", 1, 0)\ntable(clean_nhanes$cc_diabetes_num, pred_ys)\n\n   pred_ys\n        0     1\n  0 44302   859\n  1  6167   869\n\nconfusionMatrix(as.factor(pred_ys),as.factor(clean_nhanes$cc_diabetes_num), positive = '1')\n\nConfusion Matrix and Statistics\n\n          Reference\nPrediction     0     1\n         0 44302  6167\n         1   859   869\n                                          \n               Accuracy : 0.8654          \n                 95% CI : (0.8624, 0.8683)\n    No Information Rate : 0.8652          \n    P-Value [Acc &gt; NIR] : 0.4522          \n                                          \n                  Kappa : 0.1533          \n                                          \n Mcnemar's Test P-Value : &lt;2e-16          \n                                          \n            Sensitivity : 0.12351         \n            Specificity : 0.98098         \n         Pos Pred Value : 0.50289         \n         Neg Pred Value : 0.87781         \n             Prevalence : 0.13480         \n         Detection Rate : 0.01665         \n   Detection Prevalence : 0.03311         \n      Balanced Accuracy : 0.55224         \n                                          \n       'Positive' Class : 1",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#calibration-plot",
+    "href": "diagnostics.html#calibration-plot",
+    "title": "5  Model Diagnostics",
+    "section": "5.3 Calibration Plot",
+    "text": "5.3 Calibration Plot\n\nclean_nhanes$pred &lt;- pred_probs\ncalibration_plot(data = clean_nhanes, obs = \"cc_diabetes_num\", pred = \"pred\")\n\n$calibration_plot\n\n\n\n\n\n\n\n\n\nBrier Test\n\nmean((clean_nhanes$cc_diabetes_num - pred_probs)^2)\n\n[1] 0.09791126",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#homsler-lemeshow-test",
+    "href": "diagnostics.html#homsler-lemeshow-test",
+    "title": "5  Model Diagnostics",
+    "section": "5.4 Homsler-Lemeshow Test",
+    "text": "5.4 Homsler-Lemeshow Test\n\nhltest(full_diab_model_sys)\n\n\n   The Hosmer-Lemeshow goodness-of-fit test\n\n Group Size Observed   Expected\n     1 5220       29   47.93194\n     2 5220       44   96.09769\n     3 5220       99  156.96748\n     4 5220      183  236.32193\n     5 5220      347  341.67554\n     6 5220      529  485.18466\n     7 5220      848  696.01150\n     8 5220     1112 1009.00717\n     9 5220     1554 1507.32695\n    10 5217     2291 2459.47515\n\n         Statistic =  150.6378 \ndegrees of freedom =  8 \n           p-value =  &lt; 2.22e-16",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#roc-curve",
+    "href": "diagnostics.html#roc-curve",
+    "title": "5  Model Diagnostics",
+    "section": "5.5 ROC Curve",
+    "text": "5.5 ROC Curve\n\nroc_mod &lt;- roc(predictor=pred_probs, response=clean_nhanes$cc_diabetes_num)\n\nSetting levels: control = 0, case = 1\n\n\nSetting direction: controls &lt; cases\n\nplot(roc_mod, print.auc = TRUE)",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#residuals-histogram",
+    "href": "diagnostics.html#residuals-histogram",
+    "title": "5  Model Diagnostics",
+    "section": "5.6 Residuals Histogram",
+    "text": "5.6 Residuals Histogram\n\nhist(resid(full_diab_model_sys, type=\"pearson\"))\n\n\n\n\n\n\n\nlev &lt;- hatvalues(full_diab_model_sys)\ntop_10 &lt;- sort(lev, decreasing=TRUE)[1:10]\nclean_nhanes[as.numeric(names(top_10))] %&gt;% select(all_of(used_vars)) %&gt;% kable()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ncc_diabetes\nbp_sys_mean\ndemo_age_years\ndemo_race\ndemo_gender\ncc_bmi\ncc_smoke\nbp_med_use\n\n\n\n\nNo\n217.3333\n51\nOther\nWomen\n35+\nCurrent\nYes\n\n\nNo\n266.0000\n64\nNon-Hispanic Black\nWomen\n25 to &lt;30\nNever\nYes\n\n\nNo\n125.3333\n79\nOther\nMen\n30 to &lt;35\nCurrent\nNo\n\n\nNo\n102.0000\n73\nOther\nWomen\n30 to &lt;35\nCurrent\nYes\n\n\nYes\n201.3333\n80\nOther\nMen\n25 to &lt;30\nFormer\nNo\n\n\nNo\n270.0000\n80\nNon-Hispanic White\nWomen\n&lt;25\nCurrent\nYes\n\n\nNo\n128.0000\n78\nOther\nMen\n30 to &lt;35\nCurrent\nNo\n\n\nYes\n188.0000\n61\nOther\nWomen\n30 to &lt;35\nFormer\nYes\n\n\nNo\n198.0000\n69\nOther\nMen\n&lt;25\nCurrent\nYes\n\n\nYes\n173.8333\n60\nOther\nWomen\n30 to &lt;35\nCurrent\nYes",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
+  },
+  {
+    "objectID": "diagnostics.html#ignore",
+    "href": "diagnostics.html#ignore",
+    "title": "5  Model Diagnostics",
+    "section": "5.7 Ignore///",
+    "text": "5.7 Ignore///\nI followed a guide online but I don’t really know what this is doing:\n\nclean_nhanes %&gt;% \n  mutate(comp_res = coef(full_diab_model_sys)[\"demo_age_years\"]*demo_age_years + residuals(full_diab_model_sys, type = \"working\")) %&gt;% \n  ggplot(aes(x = demo_age_years, y = comp_res)) +\n  geom_point() +\n  geom_smooth(color = \"red\", method = \"lm\", linetype = 2, se = F) +\n  geom_smooth(se = F)\n\n`geom_smooth()` using formula = 'y ~ x'\n`geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = \"cs\")'\n\n\n\n\n\n\n\n\nclean_nhanes %&gt;% \n  mutate(comp_res = coef(full_diab_model_sys)[\"bp_sys_mean\"]*bp_sys_mean + residuals(full_diab_model_sys, type = \"working\")) %&gt;% \n  ggplot(aes(x = bp_sys_mean, y = comp_res)) +\n  geom_point() +\n  geom_smooth(color = \"red\", method = \"lm\", linetype = 2, se = F) +\n  geom_smooth(se = F)\n\n`geom_smooth()` using formula = 'y ~ x'\n`geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = \"cs\")'\n\n\n\n\n\n\n\n\n\nTest for Multicollinearity\n\n# vif(full_diab_model_sys)\n\nOutliers\n\noutlier_nhanes &lt;-\n  clean_nhanes %&gt;% \n  mutate(dffits = dffits(full_diab_model_sys))\n\noutlier_nhanes %&gt;% \n  mutate(obs_number = row_number(),\n         large = ifelse(abs(dffits) &gt; 2*sqrt(length(coef(full_diab_model_sys))/nobs(full_diab_model_sys)),\n                        \"red\", \"black\")) %&gt;% \n  ggplot(aes(obs_number, dffits, color = large)) +\n  geom_point() + \n  geom_hline(yintercept = c(-1,1) * 2*sqrt(length(coef(full_diab_model_sys))/nobs(full_diab_model_sys)), color = \"red\") +\n  scale_color_identity()",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Model Diagnostics</span>"
+    ]
   }
 ]

@@ -5,25 +5,33 @@ library(dplyr)
 library(tidyverse)
 library(tibble)
 library(ggplot2)
+library(knitr)
 library(lmtest)
-# library(caret)
-# library(glmtoolbox) 
-# library(predtools)
-# library(pROC)
+library(caret)
+library(glmtoolbox)
+library(predtools)
+library(pROC)
+library(car)
+
+library(devtools)
 #using data specified in this github repository:
 install_github("jhs-hwg/cardioStatsUSA")
 library(cardioStatsUSA)
 ```
 
 ```{r}
+#to prevent errors, exclude the rows with na:
+used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo_gender', 'cc_bmi', 'cc_smoke', 'bp_med_use')
+clean_nhanes <- nhanes_data[complete.cases(nhanes_data[,..used_vars]), ]
+
 null_model <- glm(cc_diabetes ~ 1, data = clean_nhanes, family=binomial)
 
-simple_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean, data = nhanes_data, family = binomial)
+simple_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean, data = clean_nhanes, family = binomial)
 
 full_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender+ cc_bmi + cc_smoke + bp_med_use, data = clean_nhanes, family = binomial)
 ```
 
-The next step will be to evaluate the model to determine its \_\_\_\_\_.
+The next step will be to evaluate the model to determine \_\_\_\_\_\_.
 
 ## Likelihood Ratio Test
 
@@ -45,13 +53,101 @@ lrtest(full_diab_model_sys, simple_diab_model_sys)
 
 ## Model Fit
 
+Let's evaluate the accuracy of our model: We first calculate the predicted probabilities using a cutoff probability of 0.5 with our model. Then, we compare these predictions to the references and find our accuracy.
+
+```{r}
+pred_probs <- predict(full_diab_model_sys, type="response")
+pred_ys <- ifelse(pred_probs >0.5, 1, 0)
+clean_nhanes$cc_diabetes_num <- ifelse(clean_nhanes$cc_diabetes == "Yes", 1, 0)
+table(clean_nhanes$cc_diabetes_num, pred_ys)
+
+confusionMatrix(as.factor(pred_ys),as.factor(clean_nhanes$cc_diabetes_num), positive = '1')
+```
+
+```{r}
+pred_probs_simple <- predict(simple_diab_model_sys, type="response")
+pred_ys <- ifelse(pred_probs >0.5, 1, 0)
+clean_nhanes$cc_diabetes_num <- ifelse(clean_nhanes$cc_diabetes == "Yes", 1, 0)
+table(clean_nhanes$cc_diabetes_num, pred_ys)
+
+confusionMatrix(as.factor(pred_ys),as.factor(clean_nhanes$cc_diabetes_num), positive = '1')
+```
+
+Our model has a final accuracy of about 86%, and mostly misclassifies those with diabetes as without (false negatives).
+
 ## Calibration Plot
 
-## Homsler-Lemeshow Test
+The calibration plot compares predicted probabilities to observed probabilities. Essentially, it will compare the data points for which the model predicted probabilities in a certain range and the true observed proportion of these data points which were predicted positives. Ideally, a model will fit close to the line x=y: this would imply that the model's predictions align with the actual outcome. For example, if our model assigns 100 data points a predicted probability value between 0 and 0.1, and 10 of those points is a positive, then our model fits the data quite well.
+
+```{r}
+clean_nhanes$pred <- pred_probs
+calibration_plot(data = clean_nhanes, obs = "cc_diabetes_num", pred = "pred")
+
+clean_nhanes$pred_simple <- pred_probs_simple
+calibration_plot(data = clean_nhanes, obs = "cc_diabetes_num", pred = "pred_simple")
+```
+
+**Brier Test**
+
+The Brier Score is a value which measures the accuracy of the model to the data. In this case, it is equal to mean-squared error.
+
+```{r}
+mean((clean_nhanes$cc_diabetes_num - pred_probs)^2)
+mean((clean_nhanes$cc_diabetes_num - pred_probs_simple)^2)
+```
+
+## Hosmer-Lemeshow Test
+
+The Homser-Lemeshow test divides the data into 10 different subgroups of equal size, each with increasing risk for positive prediction, or diabetes in our case. The observed number of those with diabetes in the each group is compared with the expected number based on the model's prediction.
+
+```{r}
+hltest(full_diab_model_sys)
+hltest(simple_diab_model_sys)
+```
+
+In our model, we can see that the expected values are somewhat higher than the observed values in the lower proportion groups, however the fit seems to generally be accurate.
 
 ## ROC Curve
 
+The Receiver Operating Curve shows the performance of a model by plotting sensitivity vs specificity at different threshold values.
+
+Sensitivity (AKA True Positive Rate) measures the proportion of true positives (samples correctly predicted as diabetes positive) to all the observed positives in the data. This can be written as $$\text{Sensitivity} = \frac{\text{True Positives}}{\text{True Positives + False Negatives}}$$
+
+Specificity (AKA True Negative Rate) measures the proportion of true negatives (samples correctly predicted as diabetes negative) to all the observed negatives in the data. This can be written as $$\text{Specificity} = \frac{\text{True Negativites}}{\text{True Negativites + False Positives}}$$
+
+As a model's sensitivity increases, specificity will tend to decrease.
+
+At different threshold values (for example, we typically use 0.5 for prediction, but could use any value from 0 to 1), we can calculate both sensitivity and specificity and plot these values on a curve.
+
+The baseline curve used for comparison is just the line y=x. This is essentially modeling random prediction. The closer the curve is to the left and top edge, the better its performance, since it shows a high sensitivity without a huge drop off in specificity.
+
+The AUC, or area under the curve, provides a single number to quantify this curve. The higher the performance of a model, the closer the ROC to the top left and the bigger the area under the curve. The ideal AUC, with both measurements always at 1 due to perfect predictions, would be 1. In practice, AUCs are typically in the range of 80-90.
+
+```{r}
+roc_mod <- roc(predictor=pred_probs, response=clean_nhanes$cc_diabetes_num)
+plot(roc_mod, print.auc = TRUE)
+
+roc_mod <- roc(predictor=pred_probs_simple, response=clean_nhanes$cc_diabetes_num)
+plot(roc_mod, print.auc = TRUE)
+```
+
 ## Residuals Histogram
+
+A histogram of residuals should resemble a standard normal distribution, ideally. The histogram will plot the frequency of each pearson residual value. In an ideal model, the error between the predictions and observations (residuals) will be a result of random noise, creating a Gaussian shape. Skewness and irregularities may be a sign that the model is not fit properly.
+
+```{r}
+hist(resid(full_diab_model_sys, type="pearson"), breaks = 20) #specify shape
+lev <- hatvalues(full_diab_model_sys)
+top_10 <- sort(lev, decreasing=TRUE)[1:10]
+clean_nhanes[as.numeric(names(top_10))] %>% select(all_of(used_vars)) %>% kable()
+```
+
+```{r}
+hist(resid(simple_diab_model_sys, type="pearson"), breaks = 20) #specify shape
+lev <- hatvalues(full_diab_model_sys)
+top_10 <- sort(lev, decreasing=TRUE)[1:10]
+clean_nhanes[as.numeric(names(top_10))] %>% select(all_of(used_vars)) %>% kable()
+```
 
 ## Ignore///
 

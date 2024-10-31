@@ -103,7 +103,7 @@ nhanes_visualize(
   )
 ```
 
-## Descriptive Graphs 
+## Descriptive Graphs
 
 ### Demographic Histograms (Blood Pressure vs Demographic Variables)
 
@@ -245,7 +245,7 @@ nhanes_ckd_df <- table(nhanes_ckd_df$htn_accaha, nhanes_ckd_df$cc_ckd)
 chisq.test(nhanes_ckd_df)
 ```
 
-### Two Sample T Tests 
+### Two Sample T Tests
 
 (Testing the Difference in blood pressure between comorbidities)
 

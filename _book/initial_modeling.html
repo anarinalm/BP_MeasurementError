@@ -243,9 +243,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># library(viridis)</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hrbrthemes)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># library(hrbrthemes)</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#using data specified in this github repository:</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"jhs-hwg/cardioStatsUSA"</span>)</span>
@@ -256,27 +256,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We are choosing Diabetes as the co-morbidity for modeling. We will try to predict the occurrence of diabetes as a function of blood pressure as well as other covariates.</p>
 <p>The most basic model possible is a simple logistic regression model predicting diabetes status based on blood pressure:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>simple_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean, <span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#to prevent errors, exclude the rows with na:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>used_vars <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'cc_diabetes'</span>, <span class="st">'bp_sys_mean'</span>, <span class="st">'demo_age_years'</span>, <span class="st">'demo_race'</span>, <span class="st">'demo_gender'</span>, <span class="st">'cc_bmi'</span>, <span class="st">'cc_smoke'</span>, <span class="st">'bp_med_use'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="ot">&lt;-</span> nhanes_data[<span class="fu">complete.cases</span>(nhanes_data[,..used_vars]), ]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>simple_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-glm(formula = cc_diabetes ~ bp_sys_mean, family = binomial, data = nhanes_data)
+glm(formula = cc_diabetes ~ bp_sys_mean, family = binomial, data = clean_nhanes)
 
 Coefficients:
               Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -4.9404827  0.0770324  -64.14   &lt;2e-16 ***
-bp_sys_mean  0.0238141  0.0005811   40.98   &lt;2e-16 ***
+(Intercept) -4.7658807  0.0796600  -59.83   &lt;2e-16 ***
+bp_sys_mean  0.0227452  0.0006007   37.87   &lt;2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 43614  on 56533  degrees of freedom
-Residual deviance: 41987  on 56532  degrees of freedom
-  (3265 observations deleted due to missingness)
-AIC: 41991
+    Null deviance: 41278  on 52196  degrees of freedom
+Residual deviance: 39888  on 52195  degrees of freedom
+AIC: 39892
 
 Number of Fisher Scoring iterations: 4</code></pre>
 </div>
@@ -306,46 +309,46 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.007</td>
-<td style="text-align: right;">0.077</td>
-<td style="text-align: right;">-64.135</td>
+<td style="text-align: right;">0.009</td>
+<td style="text-align: right;">0.080</td>
+<td style="text-align: right;">-59.828</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0.006</td>
-<td style="text-align: right;">0.008</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.010</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">bp_sys_mean</td>
-<td style="text-align: right;">1.024</td>
-<td style="text-align: right;">0.001</td>
-<td style="text-align: right;">40.982</td>
-<td style="text-align: right;">0</td>
 <td style="text-align: right;">1.023</td>
-<td style="text-align: right;">1.025</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">37.866</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.022</td>
+<td style="text-align: right;">1.024</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>simple_diab_model_dia <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_dia_mean, <span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>simple_diab_model_dia <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_dia_mean, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_diab_model_dia)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-glm(formula = cc_diabetes ~ bp_dia_mean, family = binomial, data = nhanes_data)
+glm(formula = cc_diabetes ~ bp_dia_mean, family = binomial, data = clean_nhanes)
 
 Coefficients:
              Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -1.652673   0.073728 -22.416  &lt; 2e-16 ***
-bp_dia_mean -0.003651   0.001039  -3.514 0.000441 ***
+(Intercept) -1.406666   0.076384 -18.416  &lt; 2e-16 ***
+bp_dia_mean -0.006488   0.001074  -6.039 1.55e-09 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 43309  on 56285  degrees of freedom
-Residual deviance: 43297  on 56284  degrees of freedom
-  (3513 observations deleted due to missingness)
-AIC: 43301
+    Null deviance: 41006  on 51976  degrees of freedom
+Residual deviance: 40969  on 51975  degrees of freedom
+  (220 observations deleted due to missingness)
+AIC: 40973
 
 Number of Fisher Scoring iterations: 4</code></pre>
 </div>
@@ -375,21 +378,21 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.192</td>
-<td style="text-align: right;">0.074</td>
-<td style="text-align: right;">-22.416</td>
+<td style="text-align: right;">0.245</td>
+<td style="text-align: right;">0.076</td>
+<td style="text-align: right;">-18.416</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0.166</td>
-<td style="text-align: right;">0.221</td>
+<td style="text-align: right;">0.211</td>
+<td style="text-align: right;">0.284</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">bp_dia_mean</td>
-<td style="text-align: right;">0.996</td>
-<td style="text-align: right;">0.001</td>
-<td style="text-align: right;">-3.514</td>
-<td style="text-align: right;">0</td>
 <td style="text-align: right;">0.994</td>
-<td style="text-align: right;">0.998</td>
+<td style="text-align: right;">0.001</td>
+<td style="text-align: right;">-6.039</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.991</td>
+<td style="text-align: right;">0.996</td>
 </tr>
 </tbody>
 </table>
@@ -399,7 +402,7 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <h4 data-number="4.1.0.1" class="anchored" data-anchor-id="model-explanation"><span class="header-section-number">4.1.0.1</span> Model Explanation:</h4>
 <p>For the logistic regression using systolic blood pressure, we can see that the odds ratio beta parameter is 1.024. This implies that a higher systolic blood pressure corresponds to increased chances of observing diabetes.</p>
 <p>A more exact interpretation would be that: for one additional unit increase in systolic blood pressure, the estimated risk of having diabetes increases by 2.4%.</p>
-<p>This value may not seem extremely high, yet it still has a p value evaluated to be 0 by R. We can also see that the 95% confidence interval of this parameter ranges between 1.0229 and 1.0253, meaning that the model predicts that the true relationship falls within this interval with a 95% certainty, since the true value of the parameter is most likely within this interval.</p>
+<p>This value may not seem extremely high, yet it still has a p value evaluated to be 0 by R. We can also see that the 95% confidence interval of this parameter ranges between 1.022 and 1.024, meaning that the model predicts that the true relationship falls within this interval with a 95% certainty, since the true value of the parameter is most likely within this interval.</p>
 <p>The opposite is true with diastolic blood pressure: the beta parameter is 0.996, implying that higher diastolic blood pressure corresponds to a lower chance of observing diabetes. For an additional unit increase in diastolic blood pressure, the estimated risk of having diabetes decreases by 0.04%.</p>
 <p>Note: systolic blood pressure is a better predictor of cardiovascular disease, so I chose to consider systolic rather than diastolic in future models.</p>
 </section>
@@ -408,34 +411,33 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <h2 data-number="4.2" class="anchored" data-anchor-id="demographic-model"><span class="header-section-number">4.2</span> Demographic Model</h2>
 <p>Next, we build a model including the demographic variables as well. This will hopefully provide a more accurate model, since it will have access to the further information in order to make predictions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>demo_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender,<span class="at">data =</span> nhanes_data, <span class="at">family =</span> binomial)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>demo_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender,<span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span> (demo_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 glm(formula = cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + 
-    demo_gender, family = binomial, data = nhanes_data)
+    demo_gender, family = binomial, data = clean_nhanes)
 
 Coefficients:
                               Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)                 -5.6927561  0.0885174 -64.312  &lt; 2e-16 ***
-bp_sys_mean                  0.0037581  0.0006792   5.533 3.14e-08 ***
-demo_age_years               0.0529545  0.0009161  57.806  &lt; 2e-16 ***
-demo_raceNon-Hispanic Black  0.9034242  0.0350353  25.786  &lt; 2e-16 ***
-demo_raceNon-Hispanic Asian  0.8093210  0.0606852  13.336  &lt; 2e-16 ***
-demo_raceHispanic            0.8592775  0.0343392  25.023  &lt; 2e-16 ***
-demo_raceOther               0.7478892  0.0718834  10.404  &lt; 2e-16 ***
-demo_genderWomen            -0.1547613  0.0265581  -5.827 5.63e-09 ***
+(Intercept)                 -5.6473577  0.0915063 -61.716  &lt; 2e-16 ***
+bp_sys_mean                  0.0040216  0.0006986   5.756 8.60e-09 ***
+demo_age_years               0.0516294  0.0009596  53.804  &lt; 2e-16 ***
+demo_raceNon-Hispanic Black  0.9071035  0.0357034  25.407  &lt; 2e-16 ***
+demo_raceNon-Hispanic Asian  0.7971431  0.0615302  12.955  &lt; 2e-16 ***
+demo_raceHispanic            0.8596099  0.0349608  24.588  &lt; 2e-16 ***
+demo_raceOther               0.7732236  0.0727607  10.627  &lt; 2e-16 ***
+demo_genderWomen            -0.1472718  0.0270704  -5.440 5.32e-08 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 43614  on 56533  degrees of freedom
-Residual deviance: 37780  on 56526  degrees of freedom
-  (3265 observations deleted due to missingness)
-AIC: 37796
+    Null deviance: 41278  on 52196  degrees of freedom
+Residual deviance: 36211  on 52189  degrees of freedom
+AIC: 36227
 
 Number of Fisher Scoring iterations: 5</code></pre>
 </div>
@@ -465,9 +467,9 @@ Number of Fisher Scoring iterations: 5</code></pre>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.003</td>
-<td style="text-align: right;">0.089</td>
-<td style="text-align: right;">-64.312</td>
+<td style="text-align: right;">0.004</td>
+<td style="text-align: right;">0.092</td>
+<td style="text-align: right;">-61.716</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0.003</td>
 <td style="text-align: right;">0.004</td>
@@ -476,64 +478,64 @@ Number of Fisher Scoring iterations: 5</code></pre>
 <td style="text-align: left;">bp_sys_mean</td>
 <td style="text-align: right;">1.004</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">5.533</td>
+<td style="text-align: right;">5.756</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1.002</td>
+<td style="text-align: right;">1.003</td>
 <td style="text-align: right;">1.005</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">demo_age_years</td>
-<td style="text-align: right;">1.054</td>
+<td style="text-align: right;">1.053</td>
 <td style="text-align: right;">0.001</td>
-<td style="text-align: right;">57.806</td>
+<td style="text-align: right;">53.804</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1.052</td>
-<td style="text-align: right;">1.056</td>
+<td style="text-align: right;">1.051</td>
+<td style="text-align: right;">1.055</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">demo_raceNon-Hispanic Black</td>
-<td style="text-align: right;">2.468</td>
-<td style="text-align: right;">0.035</td>
-<td style="text-align: right;">25.786</td>
+<td style="text-align: right;">2.477</td>
+<td style="text-align: right;">0.036</td>
+<td style="text-align: right;">25.407</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2.304</td>
-<td style="text-align: right;">2.643</td>
+<td style="text-align: right;">2.310</td>
+<td style="text-align: right;">2.657</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">demo_raceNon-Hispanic Asian</td>
-<td style="text-align: right;">2.246</td>
-<td style="text-align: right;">0.061</td>
-<td style="text-align: right;">13.336</td>
+<td style="text-align: right;">2.219</td>
+<td style="text-align: right;">0.062</td>
+<td style="text-align: right;">12.955</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1.993</td>
-<td style="text-align: right;">2.528</td>
+<td style="text-align: right;">1.965</td>
+<td style="text-align: right;">2.501</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">demo_raceHispanic</td>
-<td style="text-align: right;">2.361</td>
-<td style="text-align: right;">0.034</td>
-<td style="text-align: right;">25.023</td>
+<td style="text-align: right;">2.362</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">24.588</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2.208</td>
-<td style="text-align: right;">2.526</td>
+<td style="text-align: right;">2.206</td>
+<td style="text-align: right;">2.530</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">demo_raceOther</td>
-<td style="text-align: right;">2.113</td>
-<td style="text-align: right;">0.072</td>
-<td style="text-align: right;">10.404</td>
+<td style="text-align: right;">2.167</td>
+<td style="text-align: right;">0.073</td>
+<td style="text-align: right;">10.627</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1.832</td>
-<td style="text-align: right;">2.429</td>
+<td style="text-align: right;">1.876</td>
+<td style="text-align: right;">2.495</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">demo_genderWomen</td>
-<td style="text-align: right;">0.857</td>
+<td style="text-align: right;">0.863</td>
 <td style="text-align: right;">0.027</td>
-<td style="text-align: right;">-5.827</td>
+<td style="text-align: right;">-5.440</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0.813</td>
-<td style="text-align: right;">0.902</td>
+<td style="text-align: right;">0.818</td>
+<td style="text-align: right;">0.910</td>
 </tr>
 </tbody>
 </table>
@@ -541,7 +543,7 @@ Number of Fisher Scoring iterations: 5</code></pre>
 </div>
 <section id="model-explanation-1" class="level4" data-number="4.2.0.1">
 <h4 data-number="4.2.0.1" class="anchored" data-anchor-id="model-explanation-1"><span class="header-section-number">4.2.0.1</span> Model Explanation</h4>
-<p>In this model, we can still see a slight upwards trend with systolic blood pressure, although it is a bit weaker (1.024 &gt; 1.003). With this parameter, the estimated risk of having diabetes increases only by 0.3%. Although the effect is smaller, we can see that the confidence interval is between 1.0024 and 1.0051, which does not include 1. So, although small, the positive relationship is most likely significant.</p>
+<p>In this model, we can still see a slight upwards trend with systolic blood pressure, although it is a bit weaker (1.024 &gt; 1.003). With this parameter, the estimated risk of having diabetes increases only by 0.3%. Although the effect is smaller, we can see that the confidence interval is between 1.003 and 1.005, which does not include 1. So, although small, the positive relationship is most likely significant.</p>
 </section>
 <section id="demographics" class="level4" data-number="4.2.0.2">
 <h4 data-number="4.2.0.2" class="anchored" data-anchor-id="demographics"><span class="header-section-number">4.2.0.2</span> Demographics</h4>
@@ -599,13 +601,9 @@ X-squared = 5807.1, df = 1, p-value &lt; 2.2e-16</code></pre>
 </div>
 <p>After this analysis, we can see that all three variables, BMI, Smoking, and Medication Use, are all confounding. We can include all of them in the next model, in addition to systolic blood pressure and the demographic variables:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#to prevent errors down the line, exclude the rows with na:</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>used_vars <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'cc_diabetes'</span>, <span class="st">'bp_sys_mean'</span>, <span class="st">'demo_age_years'</span>, <span class="st">'demo_race'</span>, <span class="st">'demo_gender'</span>, <span class="st">'cc_bmi'</span>, <span class="st">'cc_smoke'</span>, <span class="st">'bp_med_use'</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="ot">&lt;-</span> nhanes_data[<span class="fu">complete.cases</span>(nhanes_data[,..used_vars]), ]</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>full_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender<span class="sc">+</span> cc_bmi <span class="sc">+</span> cc_smoke <span class="sc">+</span> bp_med_use, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>full_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender<span class="sc">+</span> cc_bmi <span class="sc">+</span> cc_smoke <span class="sc">+</span> bp_med_use, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
