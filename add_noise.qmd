@@ -21,17 +21,7 @@ used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo
 clean_nhanes <- nhanes_data[complete.cases(nhanes_data[,..used_vars]), ]
 ```
 
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
+Sample randomly subset n=50 (with 13% as yes)
 
 ```{r}
 
