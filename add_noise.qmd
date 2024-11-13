@@ -21,25 +21,17 @@ used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo
 clean_nhanes <- nhanes_data[complete.cases(nhanes_data[,..used_vars]), ]
 ```
 
-Sample randomly subset n=50 (with 13% as yes)
-
-```{r}
-
-```
-
-In normal usage of measurement error techniques, the data is assumed to have systematic(?) error arising from measurement of the variables which we aim to remedy. In our case, we believe that the NHANES data has no measurement error, so we will instead simulate error by adding in random noise to the existing data to create a "noisy" dataset.
+In normal usage of measurement error techniques, the data is assumed to have systematic error arising from measurement of the variables which we aim to remedy. In our case, we believe that the NHANES data has no measurement error, so we will instead simulate error by adding in random noise to the existing data to create a "noisy" dataset.
 
 First, let's remind ourselves the relationship between blood pressure and diabetes visually:
 
 ```{r}
-nrow(clean_nhanes$cc_diabetes == "Yes")
-
-nhanes_data %>% drop_na(cc_diabetes) %>%
+clean_nhanes %>%
   ggplot(aes(x=bp_sys_mean, color=cc_diabetes)) +
     geom_histogram(fill="white", alpha=0.5, bins = 80) +
     ggtitle("Blood Pressure with Diabetes Histogram")
 
-nhanes_data %>% drop_na(cc_diabetes) %>%
+clean_nhanes %>%
   ggplot(aes(x=cc_diabetes, y=bp_sys_mean, fill=cc_diabetes)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
@@ -52,13 +44,51 @@ nhanes_data %>% drop_na(cc_diabetes) %>%
     xlab("")
 ```
 
-We can also use a t-test to evaluate whether or not the two populations (diabetes and non-diabetes) have significantly different distributions of blood pressures:
+With this much data, the true true statistic (in this case, the mean blood pressure values for both groups) will be clear no matter how much noise we add. However, in normal circumstances we would not have this much data. We can instead mimic more realistic scenarios by taking a smaller subset of this data to examine. The goal will be to add noise to obscure the relationship between diabetes and blood pressure, and then use measurement error correction to rediscover the true relationship.
+
+Let's start by taking a subset of n=150. Since in the total data set, about 13% of individuals had diabetes, we will keep this ratio similar here.
 
 ```{r}
-nhanes_sys_diabetes <- nhanes_data %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
-diabetes_test <- t.test(bp_sys_mean ~ cc_diabetes, data = nhanes_sys_diabetes)
+set.seed(42)
+
+subset_diab_yes <- subset(clean_nhanes, cc_diabetes == "Yes") 
+subset_diab_no <- subset(clean_nhanes, cc_diabetes == "No")
+
+sample_diab_yes <- subset_diab_yes[sample(1:nrow(subset_diab_yes), 20, replace=FALSE),]
+sample_diab_no <- subset_diab_no[sample(1:nrow(subset_diab_no), 130, replace=FALSE),]
+
+subset_nhanes <- rbind(sample_diab_yes, sample_diab_no)
+subset_nhanes
+```
+
+```{r}
+subset_nhanes %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_diabetes)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 12) +
+    ggtitle("Blood Pressure with Diabetes Histogram")
+
+subset_nhanes%>%
+  ggplot(aes(x=cc_diabetes, y=bp_sys_mean, fill=cc_diabetes)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Diabetes Status") +
+    xlab("")
+```
+
+We can use a t-test to evaluate whether or not the two populations (diabetes and non-diabetes) have significantly different distributions of blood pressures:
+
+```{r}
+nhanes_sys_diabetes <- subset_nhanes %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean ~ cc_diabetes, data = subset_nhanes)
 diabetes_test
 ```
+
+Here we can see that with a p-value of 0.023, there is a significant difference between the two populations. The diabetes group has a mean blood pressure of about 137, while the non-diabetes group has a mean of about 124.
 
 Now we want to add in noise to the data to simulate making the measurements less accurate. We can achieve this by sampling from a normal distribution centered on 0 and adding the resulting value to the original data measurement. This will mask the patient's true blood pressure value.
 
@@ -103,80 +133,104 @@ Now, let's actually transform the data we have and visualize:
 (\*\*\*Maybe we should add noise with a Gaussian not centered at 0? Or take a smaller subset of the data? I think there's so much data that no matter how much noise is added, the true means of each group will still be clear and it will still be a significant difference\*)
 
 ```{r}
-n = nrow(clean_nhanes)
+set.seed(12)
+n = nrow(subset_nhanes)
 
-reliability <- 0.05	### Set up measurement error with 0.5 Attenuation coef
+reliability <- 0.0025	### Set up measurement error with 0.5 Attenuation coef
 sigma_u_sq <- 1/reliability - 1
-clean_nhanes$bp_sys_mean_noise0.05 <- clean_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
+subset_nhanes$bp_sys_mean_noise_low <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 
-reliability <- 0.5
+reliability <- 0.025
 sigma_u_sq <- 1/reliability - 1
-clean_nhanes$bp_sys_mean_noise0.5 <- clean_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
+subset_nhanes$bp_sys_mean_noise_med <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 
 
-reliability <- 0.7
+reliability <- 0.25
 sigma_u_sq <- 1/reliability - 1
-clean_nhanes$bp_sys_mean_noise0.7 <- clean_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
+subset_nhanes$bp_sys_mean_noise_high <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 ```
 
 Let's visualize the difference between the raw BP measurements and the measurements with new error added in:
 
 ```{r}
-scatterplot <- ggplot(clean_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise0.05)) + 
+scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_low)) + 
     geom_point(size=0.5) +
     ggtitle("Blood Pressure vs Noisy BP") +
     xlab("Raw Measurement") +
     ylab("Measurement with Error")
     
-scatterplot + annotate("segment", x = 50, xend = 300, y = 50, yend = 300,
+scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
   colour = "red")
 
-scatterplot <- ggplot(clean_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise0.7)) + 
+scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_med)) + 
     geom_point(size=0.5) +
     ggtitle("Blood Pressure vs Noisy BP") +
     xlab("Raw Measurement") +
     ylab("Measurement with Error")
     
-scatterplot + annotate("segment", x = 50, xend = 300, y = 50, yend = 300,
+scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
+  colour = "red")
+
+scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_high)) + 
+    geom_point(size=0.5) +
+    ggtitle("Blood Pressure vs Noisy BP") +
+    xlab("Raw Measurement") +
+    ylab("Measurement with Error")
+    
+scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
   colour = "red")
 ```
 
-Comparing the values created by setting reliability to 0.05 and 0.7, we can see that the spread of the scatter plot is much different. The added amount of noise in the high reliability case does not significantly shift the data points very far off from their original positions.
+Comparing the values created by setting reliability to 0.025 and 0.25, we can see that the spread of the scatter plot is much different. The added amount of noise in the high reliability case does not shift the data points very far off from their original positions compared to the low reliability case.
 
 We can also measure the "spread" of the noise by calculating the correlation coefficient. This will give us a numerical value for how linked the two variables are:
 
 ```{r}
-print(paste("Reliability 0.05 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.05))) 
-print(paste("Reliability 0.3 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.3))) 
-print(paste("Reliability 0.5 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.5))) 
-print(paste("Reliability 0.7 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.7))) 
+print(paste("Reliability 0.3 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_low))) 
+print(paste("Reliability 0.5 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_med))) 
+print(paste("Reliability 0.7 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_high))) 
 
 ```
+
+Finally, let's look again at a t-test to see if the relationship between diabetes status and noisy blood pressure is any different than the non-noisy data.
+
+```{r}
+nhanes_sys_diabetes <- subset_nhanes %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean_noise_low ~ cc_diabetes, data = subset_nhanes)
+diabetes_test
+
+nhanes_sys_diabetes <- subset_nhanes %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean_noise_med ~ cc_diabetes, data = subset_nhanes)
+diabetes_test
+
+nhanes_sys_diabetes <- subset_nhanes %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean_noise_high ~ cc_diabetes, data = subset_nhanes)
+diabetes_test
+```
+
+We can see that in the low reliability case, enough noise was added that the results of the t-test are no longer significant, as the p-value is much higher than 0.05. In the medium reliability case, the results are still significant, but much less so, with the p-value doubling from 0.02 to 0.04. Finally, in the high reliability case, the results of the t-test are not much different than when using the raw data. This is because the amount of noise added was quite low.
 
 Now, we will try to fit a linear regression model to estimate the raw measurement from the "error"-full measurement.
 
 ```{r}
-error_model_0.005 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.05, data = clean_nhanes, family = 'gaussian')
-summary(error_model_0.005)
-
-error_model_0.3 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.3, data = clean_nhanes, family = 'gaussian')
+error_model_0.3 <- glm(bp_sys_mean ~ bp_sys_mean_noise_low, data = subset_nhanes, family = 'gaussian')
 summary(error_model_0.3)
 
-error_model_0.5 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.5, data = clean_nhanes, family = 'gaussian')
+error_model_0.5 <- glm(bp_sys_mean ~ bp_sys_mean_noise_med, data = subset_nhanes, family = 'gaussian')
 summary(error_model_0.5)
 
-error_model_0.7 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.7, data = clean_nhanes, family = 'gaussian')
+error_model_0.7 <- glm(bp_sys_mean ~ bp_sys_mean_noise_high, data = subset_nhanes, family = 'gaussian')
 summary(error_model_0.7)
 ```
 
 ```{r}
-clean_nhanes %>%
-  ggplot(aes(x=bp_sys_mean_noise0.05, color=cc_diabetes)) +
-    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+subset_nhanes %>%
+  ggplot(aes(x=bp_sys_mean_noise_low, color=cc_diabetes)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 12) +
     ggtitle("Blood Pressure with Diabetes Histogram")
 
-clean_nhanes %>%
-  ggplot(aes(x=cc_diabetes, y=bp_sys_mean_noise0.05, fill=cc_diabetes)) +
+subset_nhanes %>%
+  ggplot(aes(x=cc_diabetes, y=bp_sys_mean_noise_low, fill=cc_diabetes)) +
     geom_boxplot() +
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     theme_ipsum() +
@@ -188,7 +242,6 @@ clean_nhanes %>%
     xlab("")
 ```
 
-```{r}
-diabetes_test <- t.test(bp_sys_mean_noise0.005 ~ cc_diabetes, data =clean_nhanes)
-diabetes_test
-```
+We can see in both the histogram and especially in the box plot, the noise has made it so that the two group's distributions are virtually indistinguishable. This mimics what may happen in the real world: although the underlying distribution of two groups may be different, error in measurement may mask this fact so that the data given looks very similar. Had we been given the noisy data and performed a t-test without accounting for this error, we would come to the incorrect conclusion that diabetes and blood pressure are not linked.
+
+This is the main issue that measurement error seeks to correct. By using it, we can avoid drawing incorrect conclusions about our data.
