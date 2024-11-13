@@ -49,7 +49,7 @@ With this much data, the true true statistic (in this case, the mean blood press
 Let's start by taking a subset of n=150. Since in the total data set, about 13% of individuals had diabetes, we will keep this ratio similar here.
 
 ```{r}
-set.seed(42)
+set.seed(52)
 
 subset_diab_yes <- subset(clean_nhanes, cc_diabetes == "Yes") 
 subset_diab_no <- subset(clean_nhanes, cc_diabetes == "No")
@@ -143,7 +143,6 @@ subset_nhanes$bp_sys_mean_noise_low <- subset_nhanes$bp_sys_mean + rnorm(n, sd=s
 reliability <- 0.025
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_med <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
-
 
 reliability <- 0.25
 sigma_u_sq <- 1/reliability - 1
@@ -245,3 +244,8 @@ subset_nhanes %>%
 We can see in both the histogram and especially in the box plot, the noise has made it so that the two group's distributions are virtually indistinguishable. This mimics what may happen in the real world: although the underlying distribution of two groups may be different, error in measurement may mask this fact so that the data given looks very similar. Had we been given the noisy data and performed a t-test without accounting for this error, we would come to the incorrect conclusion that diabetes and blood pressure are not linked.
 
 This is the main issue that measurement error seeks to correct. By using it, we can avoid drawing incorrect conclusions about our data.
+
+```{r}
+#Store our dataframe:
+saveRDS(subset_nhanes, "nhanes_subset.rds")
+```
