@@ -16,7 +16,7 @@ library(cardioStatsUSA)
 ```
 
 ```{r}
-#to prevent errors, exclude the rows with na:
+#to prevent errors, exclude the rows with na
 used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo_gender', 'cc_bmi', 'cc_smoke', 'bp_med_use')
 clean_nhanes <- nhanes_data[complete.cases(nhanes_data[,..used_vars]), ]
 ```
@@ -49,13 +49,14 @@ With this much data, the true true statistic (in this case, the mean blood press
 Let's start by taking a subset of n=150. Since in the total data set, about 13% of individuals had diabetes, we will keep this ratio similar here.
 
 ```{r}
-set.seed(52)
+set.seed(13)
+#original: seed 52, subset yes = 20, subset no = 130
 
 subset_diab_yes <- subset(clean_nhanes, cc_diabetes == "Yes") 
 subset_diab_no <- subset(clean_nhanes, cc_diabetes == "No")
 
-sample_diab_yes <- subset_diab_yes[sample(1:nrow(subset_diab_yes), 20, replace=FALSE),]
-sample_diab_no <- subset_diab_no[sample(1:nrow(subset_diab_no), 130, replace=FALSE),]
+sample_diab_yes <- subset_diab_yes[sample(1:nrow(subset_diab_yes), 65, replace=FALSE),]
+sample_diab_no <- subset_diab_no[sample(1:nrow(subset_diab_no), 435, replace=FALSE),]
 
 subset_nhanes <- rbind(sample_diab_yes, sample_diab_no)
 subset_nhanes
@@ -88,7 +89,7 @@ diabetes_test <- t.test(bp_sys_mean ~ cc_diabetes, data = subset_nhanes)
 diabetes_test
 ```
 
-Here we can see that with a p-value of 0.023, there is a significant difference between the two populations. The diabetes group has a mean blood pressure of about 137, while the non-diabetes group has a mean of about 124.
+Here we can see that with a p-value of 0.007, there is a significant difference between the two populations. The diabetes group has a mean blood pressure of about 137, while the non-diabetes group has a mean of about 124.
 
 Now we want to add in noise to the data to simulate making the measurements less accurate. We can achieve this by sampling from a normal distribution centered on 0 and adding the resulting value to the original data measurement. This will mask the patient's true blood pressure value.
 
@@ -130,21 +131,19 @@ With a variance of 0.43 and standard deviation of 0.65, this reliability value c
 
 Now, let's actually transform the data we have and visualize:
 
-(\*\*\*Maybe we should add noise with a Gaussian not centered at 0? Or take a smaller subset of the data? I think there's so much data that no matter how much noise is added, the true means of each group will still be clear and it will still be a significant difference\*)
-
 ```{r}
 set.seed(12)
 n = nrow(subset_nhanes)
 
-reliability <- 0.0025	### Set up measurement error with 0.5 Attenuation coef
+reliability <- 0.001	### Set up measurement error with 0.5 Attenuation coef
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_low <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 
-reliability <- 0.025
+reliability <- 0.0025
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_med <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 
-reliability <- 0.25
+reliability <- 0.025
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_high <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 ```
@@ -152,29 +151,32 @@ subset_nhanes$bp_sys_mean_noise_high <- subset_nhanes$bp_sys_mean + rnorm(n, sd=
 Let's visualize the difference between the raw BP measurements and the measurements with new error added in:
 
 ```{r}
+#X axis = Blood Pressure
+#Y axis = BP + Noise
+#Title = Low, Moderate, High Reliability (0.25), for example
 scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_low)) + 
     geom_point(size=0.5) +
-    ggtitle("Blood Pressure vs Noisy BP") +
-    xlab("Raw Measurement") +
-    ylab("Measurement with Error")
+    ggtitle("Low Reliability") +
+    xlab("Blood Pressure") +
+    ylab("BP + Noise")
     
 scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
   colour = "red")
 
 scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_med)) + 
     geom_point(size=0.5) +
-    ggtitle("Blood Pressure vs Noisy BP") +
-    xlab("Raw Measurement") +
-    ylab("Measurement with Error")
+    ggtitle("Medium Reliability") +
+    xlab("Blood Pressure") +
+    ylab("BP + Error")
     
 scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
   colour = "red")
 
 scatterplot <- ggplot(subset_nhanes, aes(x=bp_sys_mean, y=bp_sys_mean_noise_high)) + 
     geom_point(size=0.5) +
-    ggtitle("Blood Pressure vs Noisy BP") +
-    xlab("Raw Measurement") +
-    ylab("Measurement with Error")
+    ggtitle("High Reliability") +
+    xlab("Blood Pressure") +
+    ylab("BP + Error")
     
 scatterplot + annotate("segment", x = 75, xend = 200, y = 75, yend = 200,
   colour = "red")
@@ -185,9 +187,9 @@ Comparing the values created by setting reliability to 0.025 and 0.25, we can se
 We can also measure the "spread" of the noise by calculating the correlation coefficient. This will give us a numerical value for how linked the two variables are:
 
 ```{r}
-print(paste("Reliability 0.3 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_low))) 
-print(paste("Reliability 0.5 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_med))) 
-print(paste("Reliability 0.7 Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_high))) 
+print(paste("Reliability Low Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_low))) 
+print(paste("Reliability Medium Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_med))) 
+print(paste("Reliability High Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_high)))
 
 ```
 
