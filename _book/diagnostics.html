@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
+<link href="./add_noise.html" rel="next">
 <link href="./initial_modeling.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -81,13 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
+  "limit": 20,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -96,42 +90,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -141,13 +106,13 @@ window.Quarto = {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./diagnostics.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Model Diagnostics</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./diagnostics.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Model Diagnostics</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -156,7 +121,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Measurement Error</a> 
@@ -190,19 +155,25 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./visualization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Data Examination</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Data Visualization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./initial_modeling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurence</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurrence</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./diagnostics.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Model Diagnostics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./add_noise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Creating “Noisy” Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -214,7 +185,7 @@ window.Quarto = {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -224,7 +195,7 @@ window.Quarto = {
   <li><a href="#likelihood-ratio-test" id="toc-likelihood-ratio-test" class="nav-link active" data-scroll-target="#likelihood-ratio-test"><span class="header-section-number">5.1</span> Likelihood Ratio Test</a></li>
   <li><a href="#model-fit" id="toc-model-fit" class="nav-link" data-scroll-target="#model-fit"><span class="header-section-number">5.2</span> Model Fit</a></li>
   <li><a href="#calibration-plot" id="toc-calibration-plot" class="nav-link" data-scroll-target="#calibration-plot"><span class="header-section-number">5.3</span> Calibration Plot</a></li>
-  <li><a href="#homsler-lemeshow-test" id="toc-homsler-lemeshow-test" class="nav-link" data-scroll-target="#homsler-lemeshow-test"><span class="header-section-number">5.4</span> Homsler-Lemeshow Test</a></li>
+  <li><a href="#hosmer-lemeshow-test" id="toc-hosmer-lemeshow-test" class="nav-link" data-scroll-target="#hosmer-lemeshow-test"><span class="header-section-number">5.4</span> Hosmer-Lemeshow Test</a></li>
   <li><a href="#roc-curve" id="toc-roc-curve" class="nav-link" data-scroll-target="#roc-curve"><span class="header-section-number">5.5</span> ROC Curve</a></li>
   <li><a href="#residuals-histogram" id="toc-residuals-histogram" class="nav-link" data-scroll-target="#residuals-histogram"><span class="header-section-number">5.6</span> Residuals Histogram</a></li>
   <li><a href="#ignore" id="toc-ignore" class="nav-link" data-scroll-target="#ignore"><span class="header-section-number">5.7</span> Ignore///</a></li>
@@ -249,9 +220,7 @@ window.Quarto = {
   </div>
   
 
-
 </header>
-
 
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -282,7 +251,7 @@ window.Quarto = {
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>full_diab_model_sys <span class="ot">&lt;-</span> <span class="fu">glm</span>(cc_diabetes <span class="sc">~</span> bp_sys_mean <span class="sc">+</span> demo_age_years <span class="sc">+</span> demo_race <span class="sc">+</span> demo_gender<span class="sc">+</span> cc_bmi <span class="sc">+</span> cc_smoke <span class="sc">+</span> bp_med_use, <span class="at">data =</span> clean_nhanes, <span class="at">family =</span> binomial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The next step will be to evaluate the model to determine its _____.</p>
+<p>The next step will be to evaluate the model to determine ______.</p>
 <section id="likelihood-ratio-test" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="likelihood-ratio-test"><span class="header-section-number">5.1</span> Likelihood Ratio Test</h2>
 <p>The likelihood ratio test involves comparing whether two models are significantly different. Here, we will compare our full model with the null model (no covariates):</p>
@@ -360,6 +329,7 @@ window.Quarto = {
 </section>
 <section id="model-fit" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="model-fit"><span class="header-section-number">5.2</span> Model Fit</h2>
+<p>Let’s evaluate the accuracy of our model: We first calculate the predicted probabilities using a cutoff probability of 0.5 with our model. Then, we compare these predictions to the references and find our accuracy.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pred_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(full_diab_model_sys, <span class="at">type=</span><span class="st">"response"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pred_ys <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_probs <span class="sc">&gt;</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
@@ -402,35 +372,89 @@ Prediction     0     1
                                           </code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pred_probs_simple <span class="ot">&lt;-</span> <span class="fu">predict</span>(simple_diab_model_sys, <span class="at">type=</span><span class="st">"response"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pred_ys <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_probs <span class="sc">&gt;</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes<span class="sc">$</span>cc_diabetes_num <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(clean_nhanes<span class="sc">$</span>cc_diabetes <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(clean_nhanes<span class="sc">$</span>cc_diabetes_num, pred_ys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   pred_ys
+        0     1
+  0 44302   859
+  1  6167   869</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(pred_ys),<span class="fu">as.factor</span>(clean_nhanes<span class="sc">$</span>cc_diabetes_num), <span class="at">positive =</span> <span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction     0     1
+         0 44302  6167
+         1   859   869
+                                          
+               Accuracy : 0.8654          
+                 95% CI : (0.8624, 0.8683)
+    No Information Rate : 0.8652          
+    P-Value [Acc &gt; NIR] : 0.4522          
+                                          
+                  Kappa : 0.1533          
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.12351         
+            Specificity : 0.98098         
+         Pos Pred Value : 0.50289         
+         Neg Pred Value : 0.87781         
+             Prevalence : 0.13480         
+         Detection Rate : 0.01665         
+   Detection Prevalence : 0.03311         
+      Balanced Accuracy : 0.55224         
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Our model has a final accuracy of about 86%, and mostly misclassifies those with diabetes as without (false negatives).</p>
 </section>
 <section id="calibration-plot" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="calibration-plot"><span class="header-section-number">5.3</span> Calibration Plot</h2>
+<p>The calibration plot compares predicted probabilities to observed probabilities. Essentially, it will compare the data points for which the model predicted probabilities in a certain range and the true observed proportion of these data points which were predicted positives. Ideally, a model will fit close to the line x=y: this would imply that the model’s predictions align with the actual outcome. For example, if our model assigns 100 data points a predicted probability value between 0 and 0.1, and 10 of those points is a positive, then our model fits the data quite well.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes<span class="sc">$</span>pred <span class="ot">&lt;-</span> pred_probs</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">calibration_plot</span>(<span class="at">data =</span> clean_nhanes, <span class="at">obs =</span> <span class="st">"cc_diabetes_num"</span>, <span class="at">pred =</span> <span class="st">"pred"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes<span class="sc">$</span>pred <span class="ot">&lt;-</span> pred_probs</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">calibration_plot</span>(<span class="at">data =</span> clean_nhanes, <span class="at">obs =</span> <span class="st">"cc_diabetes_num"</span>, <span class="at">pred =</span> <span class="st">"pred"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$calibration_plot</code></pre>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes<span class="sc">$</span>pred_simple <span class="ot">&lt;-</span> pred_probs_simple</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">calibration_plot</span>(<span class="at">data =</span> clean_nhanes, <span class="at">obs =</span> <span class="st">"cc_diabetes_num"</span>, <span class="at">pred =</span> <span class="st">"pred_simple"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$calibration_plot</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</div>
-<p>Brier Test</p>
+<p><strong>Brier Test</strong></p>
+<p>The Brier Score is a value which measures the accuracy of the model to the data. In this case, it is equal to mean-squared error.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>((clean_nhanes<span class="sc">$</span>cc_diabetes_num <span class="sc">-</span> pred_probs)<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>((clean_nhanes<span class="sc">$</span>cc_diabetes_num <span class="sc">-</span> pred_probs)<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.09791126</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>((clean_nhanes<span class="sc">$</span>cc_diabetes_num <span class="sc">-</span> pred_probs_simple)<span class="sc">^</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1137431</code></pre>
+</div>
 </div>
 </section>
-<section id="homsler-lemeshow-test" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="homsler-lemeshow-test"><span class="header-section-number">5.4</span> Homsler-Lemeshow Test</h2>
+<section id="hosmer-lemeshow-test" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="hosmer-lemeshow-test"><span class="header-section-number">5.4</span> Hosmer-Lemeshow Test</h2>
+<p>The Homser-Lemeshow test divides the data into 10 different subgroups of equal size, each with increasing risk for positive prediction, or diabetes in our case. The observed number of those with diabetes in the each group is compared with the expected number based on the model’s prediction.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hltest</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hltest</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
    The Hosmer-Lemeshow goodness-of-fit test
@@ -451,42 +475,211 @@ Prediction     0     1
 degrees of freedom =  8 
            p-value =  &lt; 2.22e-16 </code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hltest</span>(simple_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   The Hosmer-Lemeshow goodness-of-fit test
+
+ Group Size Observed    Expected
+     1 5310      320  392.900614
+     2 5205      336  455.497648
+     3 4905      382  472.429670
+     4 5211      470  544.366735
+     5 5159      547  583.643016
+     6 5283      707  652.225758
+     7 5229      818  710.886418
+     8 5410     1057  830.456544
+     9 5260     1129  962.117074
+    10 5220     1269 1427.789578
+    11    5        1    3.686982
+
+         Statistic =  246.1812 
+degrees of freedom =  9 
+           p-value =  &lt; 2.22e-16 </code></pre>
 </div>
+</div>
+<p>In our model, we can see that the expected values are somewhat higher than the observed values in the lower proportion groups, however the fit seems to generally be accurate.</p>
 </section>
 <section id="roc-curve" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="roc-curve"><span class="header-section-number">5.5</span> ROC Curve</h2>
+<p>The Receiver Operating Curve shows the performance of a model by plotting sensitivity vs specificity at different threshold values.</p>
+<p>Sensitivity (AKA True Positive Rate) measures the proportion of true positives (samples correctly predicted as diabetes positive) to all the observed positives in the data. This can be written as <span class="math display">\[\text{Sensitivity} = \frac{\text{True Positives}}{\text{True Positives + False Negatives}}\]</span></p>
+<p>Specificity (AKA True Negative Rate) measures the proportion of true negatives (samples correctly predicted as diabetes negative) to all the observed negatives in the data. This can be written as <span class="math display">\[\text{Specificity} = \frac{\text{True Negativites}}{\text{True Negativites + False Positives}}\]</span></p>
+<p>As a model’s sensitivity increases, specificity will tend to decrease.</p>
+<p>At different threshold values (for example, we typically use 0.5 for prediction, but could use any value from 0 to 1), we can calculate both sensitivity and specificity and plot these values on a curve.</p>
+<p>The baseline curve used for comparison is just the line y=x. This is essentially modeling random prediction. The closer the curve is to the left and top edge, the better its performance, since it shows a high sensitivity without a huge drop off in specificity.</p>
+<p>The AUC, or area under the curve, provides a single number to quantify this curve. The higher the performance of a model, the closer the ROC to the top left and the bigger the area under the curve. The ideal AUC, with both measurements always at 1 due to perfect predictions, would be 1. In practice, AUCs are typically in the range of 80-90.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>roc_mod <span class="ot">&lt;-</span> <span class="fu">roc</span>(<span class="at">predictor=</span>pred_probs, <span class="at">response=</span>clean_nhanes<span class="sc">$</span>cc_diabetes_num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>roc_mod <span class="ot">&lt;-</span> <span class="fu">roc</span>(<span class="at">predictor=</span>pred_probs, <span class="at">response=</span>clean_nhanes<span class="sc">$</span>cc_diabetes_num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting levels: control = 0, case = 1</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting direction: controls &lt; cases</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roc_mod, <span class="at">print.auc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roc_mod, <span class="at">print.auc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>roc_mod <span class="ot">&lt;-</span> <span class="fu">roc</span>(<span class="at">predictor=</span>pred_probs_simple, <span class="at">response=</span>clean_nhanes<span class="sc">$</span>cc_diabetes_num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Setting levels: control = 0, case = 1
+Setting direction: controls &lt; cases</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(roc_mod, <span class="at">print.auc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="residuals-histogram" class="level2" data-number="5.6">
 <h2 data-number="5.6" class="anchored" data-anchor-id="residuals-histogram"><span class="header-section-number">5.6</span> Residuals Histogram</h2>
+<p>A histogram of residuals should resemble a standard normal distribution, ideally. The histogram will plot the frequency of each pearson residual value. In an ideal model, the error between the predictions and observations (residuals) will be a result of random noise, creating a Gaussian shape. Skewness and irregularities may be a sign that the model is not fit properly.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">resid</span>(full_diab_model_sys, <span class="at">type=</span><span class="st">"pearson"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">resid</span>(full_diab_model_sys, <span class="at">type=</span><span class="st">"pearson"</span>), <span class="at">breaks =</span> <span class="dv">20</span>) <span class="co">#specify shape</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lev <span class="ot">&lt;-</span> <span class="fu">hatvalues</span>(full_diab_model_sys)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>top_10 <span class="ot">&lt;-</span> <span class="fu">sort</span>(lev, <span class="at">decreasing=</span><span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes[<span class="fu">as.numeric</span>(<span class="fu">names</span>(top_10))] <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(used_vars)) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 19%">
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">cc_diabetes</th>
+<th style="text-align: right;">bp_sys_mean</th>
+<th style="text-align: right;">demo_age_years</th>
+<th style="text-align: left;">demo_race</th>
+<th style="text-align: left;">demo_gender</th>
+<th style="text-align: left;">cc_bmi</th>
+<th style="text-align: left;">cc_smoke</th>
+<th style="text-align: left;">bp_med_use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">217.3333</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">35+</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">266.0000</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: left;">Non-Hispanic Black</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">25 to &lt;30</td>
+<td style="text-align: left;">Never</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">125.3333</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Men</td>
+<td style="text-align: left;">30 to &lt;35</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">102.0000</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">30 to &lt;35</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">201.3333</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Men</td>
+<td style="text-align: left;">25 to &lt;30</td>
+<td style="text-align: left;">Former</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">270.0000</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: left;">Non-Hispanic White</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">&lt;25</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">128.0000</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Men</td>
+<td style="text-align: left;">30 to &lt;35</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">188.0000</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">30 to &lt;35</td>
+<td style="text-align: left;">Former</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">198.0000</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Men</td>
+<td style="text-align: left;">&lt;25</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">173.8333</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">Other</td>
+<td style="text-align: left;">Women</td>
+<td style="text-align: left;">30 to &lt;35</td>
+<td style="text-align: left;">Current</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lev <span class="ot">&lt;-</span> <span class="fu">hatvalues</span>(full_diab_model_sys)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>top_10 <span class="ot">&lt;-</span> <span class="fu">sort</span>(lev, <span class="at">decreasing=</span><span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes[<span class="fu">as.numeric</span>(<span class="fu">names</span>(top_10))] <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(used_vars)) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">resid</span>(simple_diab_model_sys, <span class="at">type=</span><span class="st">"pearson"</span>), <span class="at">breaks =</span> <span class="dv">20</span>) <span class="co">#specify shape</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>lev <span class="ot">&lt;-</span> <span class="fu">hatvalues</span>(full_diab_model_sys)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>top_10 <span class="ot">&lt;-</span> <span class="fu">sort</span>(lev, <span class="at">decreasing=</span><span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>clean_nhanes[<span class="fu">as.numeric</span>(<span class="fu">names</span>(top_10))] <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">all_of</span>(used_vars)) <span class="sc">%&gt;%</span> <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
@@ -621,65 +814,63 @@ degrees of freedom =  8
 <h2 data-number="5.7" class="anchored" data-anchor-id="ignore"><span class="header-section-number">5.7</span> Ignore///</h2>
 <p>I followed a guide online but I don’t really know what this is doing:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"demo_age_years"</span>]<span class="sc">*</span>demo_age_years <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> demo_age_years, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"demo_age_years"</span>]<span class="sc">*</span>demo_age_years <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> demo_age_years, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'
 `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</code></pre>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
-</div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"bp_sys_mean"</span>]<span class="sc">*</span>bp_sys_mean <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> bp_sys_mean, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comp_res =</span> <span class="fu">coef</span>(full_diab_model_sys)[<span class="st">"bp_sys_mean"</span>]<span class="sc">*</span>bp_sys_mean <span class="sc">+</span> <span class="fu">residuals</span>(full_diab_model_sys, <span class="at">type =</span> <span class="st">"working"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> bp_sys_mean, <span class="at">y =</span> comp_res)) <span class="sc">+</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'
 `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</code></pre>
 </div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Test for Multicollinearity</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># vif(full_diab_model_sys)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(full_diab_model_sys)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   GVIF Df GVIF^(1/(2*Df))
+bp_sys_mean    1.169212  1        1.081301
+demo_age_years 1.528167  1        1.236191
+demo_race      1.207663  4        1.023866
+demo_gender    1.091056  1        1.044536
+cc_bmi         1.182024  3        1.028263
+cc_smoke       1.173951  2        1.040908
+bp_med_use     1.235766  1        1.111650</code></pre>
+</div>
 </div>
 <p>Outliers</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="ot">&lt;-</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  clean_nhanes <span class="sc">%&gt;%</span> </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dffits =</span> <span class="fu">dffits</span>(full_diab_model_sys))</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="sc">%&gt;%</span> </span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">obs_number =</span> <span class="fu">row_number</span>(),</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">large =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(dffits) <span class="sc">&gt;</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)),</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"red"</span>, <span class="st">"black"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(obs_number, dffits, <span class="at">color =</span> large)) <span class="sc">+</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="sc">*</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="ot">&lt;-</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  clean_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dffits =</span> <span class="fu">dffits</span>(full_diab_model_sys))</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>outlier_nhanes <span class="sc">%&gt;%</span> </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">obs_number =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">large =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(dffits) <span class="sc">&gt;</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)),</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"red"</span>, <span class="st">"black"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(obs_number, dffits, <span class="at">color =</span> large)) <span class="sc">+</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>) <span class="sc">*</span> <span class="dv">2</span><span class="sc">*</span><span class="fu">sqrt</span>(<span class="fu">length</span>(<span class="fu">coef</span>(full_diab_model_sys))<span class="sc">/</span><span class="fu">nobs</span>(full_diab_model_sys)), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="diagnostics_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
+<p><img src="diagnostics_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 
@@ -766,27 +957,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -796,17 +970,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -818,130 +983,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
-          }
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
-        }
-        return container.innerHTML
-      } else {
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
-      }
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
-          }
-        } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
-            if (note !== null) {
-              const html = processXRef(id, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
+      return note.innerHTML;
     });
   }
       let selectedAnnoteEl;
@@ -985,7 +1027,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1011,32 +1052,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1098,18 +1113,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./initial_modeling.html" class="pagination-link" aria-label="Modeling Diabetes Occurence">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurence</span></span>
+      <a href="./initial_modeling.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling Diabetes Occurrence</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./add_noise.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Creating “Noisy” Data</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
-
 
 
 

@@ -1,4 +1,4 @@
-# Modeling Diabetes Occurence
+# Modeling Diabetes Occurrence
 
 ```{r message = FALSE, warning= FALSE}
 library(dplyr)

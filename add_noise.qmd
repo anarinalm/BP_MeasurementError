@@ -147,7 +147,7 @@ We can also measure the "spread" of the noise by calculating the correlation coe
 
 ```{r}
 print(paste("Reliability 0.05 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.05))) 
-print(paste("Reliability 0.3 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.3))) 
+#print(paste("Reliability 0.3 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.3))) 
 print(paste("Reliability 0.5 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.5))) 
 print(paste("Reliability 0.7 Correlation Coefficient:", cor(clean_nhanes$bp_sys_mean, clean_nhanes$bp_sys_mean_noise0.7))) 
 
@@ -159,12 +159,12 @@ Now, we will try to fit a linear regression model to estimate the raw measuremen
 error_model_0.005 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.05, data = clean_nhanes, family = 'gaussian')
 summary(error_model_0.005)
 
-error_model_0.3 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.3, data = clean_nhanes, family = 'gaussian')
-summary(error_model_0.3)
+#error_model_0.3 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.3, data = clean_nhanes, family = 'gaussian')
+#summary(error_model_0.3)
 
 error_model_0.5 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.5, data = clean_nhanes, family = 'gaussian')
 summary(error_model_0.5)
-
+#bp_sys_mean_noise0.005
 error_model_0.7 <- glm(bp_sys_mean ~ bp_sys_mean_noise0.7, data = clean_nhanes, family = 'gaussian')
 summary(error_model_0.7)
 ```
@@ -189,6 +189,6 @@ clean_nhanes %>%
 ```
 
 ```{r}
-diabetes_test <- t.test(bp_sys_mean_noise0.005 ~ cc_diabetes, data =clean_nhanes)
-diabetes_test
+#diabetes_test <- t.test(bp_sys_mean_noise0.005 ~ cc_diabetes, data =clean_nhanes)
+#ddiabetes_test
 ```
