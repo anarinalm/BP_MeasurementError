@@ -1,9 +1,10 @@
-# Data Examination
+# Data Visualization
 
 ```{r message = FALSE, warning = FALSE}
 
 library(dplyr)
 library(tidyverse)
+library(gtsummary)
 library(tibble)
 library(ggplot2)
 library(data.table)
