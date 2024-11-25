@@ -49,17 +49,17 @@ With this much data, the true true statistic (in this case, the mean blood press
 Let's start by taking a subset of n=150. Since in the total data set, about 13% of individuals had diabetes, we will keep this ratio similar here.
 
 ```{r}
-set.seed(13)
+set.seed(19)
 #original: seed 52, subset yes = 20, subset no = 130
 
 subset_diab_yes <- subset(clean_nhanes, cc_diabetes == "Yes") 
 subset_diab_no <- subset(clean_nhanes, cc_diabetes == "No")
 
-sample_diab_yes <- subset_diab_yes[sample(1:nrow(subset_diab_yes), 65, replace=FALSE),]
-sample_diab_no <- subset_diab_no[sample(1:nrow(subset_diab_no), 435, replace=FALSE),]
+sample_diab_yes <- subset_diab_yes[sample(1:nrow(subset_diab_yes), 78, replace=FALSE),]
+sample_diab_no <- subset_diab_no[sample(1:nrow(subset_diab_no), 522, replace=FALSE),]
 
 subset_nhanes <- rbind(sample_diab_yes, sample_diab_no)
-subset_nhanes
+head(subset_nhanes)
 ```
 
 ```{r}
@@ -132,18 +132,19 @@ With a variance of 0.43 and standard deviation of 0.65, this reliability value c
 Now, let's actually transform the data we have and visualize:
 
 ```{r}
-set.seed(12)
+set.seed(105)
 n = nrow(subset_nhanes)
 
-reliability <- 0.001	### Set up measurement error with 0.5 Attenuation coef
+reliability <- 0.0005	### Set up measurement error with 0.5 Attenuation coef
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_low <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
+subset_nhanes$bp_sys_mean_noise_low <- abs(subset_nhanes$bp_sys_mean_noise_low)
 
-reliability <- 0.0025
+reliability <- 0.005
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_med <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 
-reliability <- 0.025
+reliability <- 0.1
 sigma_u_sq <- 1/reliability - 1
 subset_nhanes$bp_sys_mean_noise_high <- subset_nhanes$bp_sys_mean + rnorm(n, sd=sigma_u_sq^0.5)
 ```
@@ -186,6 +187,10 @@ Comparing the values created by setting reliability to 0.025 and 0.25, we can se
 
 We can also measure the "spread" of the noise by calculating the correlation coefficient. This will give us a numerical value for how linked the two variables are:
 
+In some cases:
+
+Notice that in the low reliability case, so much noise here is added that there are a few data points with a blood pressure value **below 0**. Data with this much error in it obviously wouldn't be used in the real world, but for the sake of demonstrating the effectiveness of measurement error correction, we will continue to use this data.
+
 ```{r}
 print(paste("Reliability Low Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_low))) 
 print(paste("Reliability Medium Correlation Coefficient:", cor(subset_nhanes$bp_sys_mean, subset_nhanes$bp_sys_mean_noise_med))) 
@@ -209,7 +214,7 @@ diabetes_test <- t.test(bp_sys_mean_noise_high ~ cc_diabetes, data = subset_nhan
 diabetes_test
 ```
 
-We can see that in the low reliability case, enough noise was added that the results of the t-test are no longer significant, as the p-value is much higher than 0.05. In the medium reliability case, the results are still significant, but much less so, with the p-value doubling from 0.02 to 0.04. Finally, in the high reliability case, the results of the t-test are not much different than when using the raw data. This is because the amount of noise added was quite low.
+We can see that in the low reliability case, enough noise was added that the results of the t-test are no longer significant, as the p-value is higher than 0.05. In the medium reliability case, the results are still significant, but much less so, with the p-value doubling from 0.02 to 0.04. Finally, in the high reliability case, the results of the t-test are not much different than when using the raw data. This is because the amount of noise added was quite low.
 
 Now, we will try to fit a linear regression model to estimate the raw measurement from the "error"-full measurement.
 

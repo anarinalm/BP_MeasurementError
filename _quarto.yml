@@ -14,7 +14,7 @@ book:
     - initial_modeling.qmd
     - diagnostics.qmd
     - add_noise.qmd
-    - reg_cal.qmd
+#    - reg_cal.qmd
     - references.qmd
 
 bibliography: references.bib

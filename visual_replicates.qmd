@@ -1,0 +1,75 @@
+Following the example in <https://jhs-hwg.github.io/cardioStatsUSA/articles/replicate_nchs_2017.html>:
+
+```{r}
+# Make a copy here so that we don't modify the NHANES data
+# (doing so would break tests that are run after this one)
+nhanes_data_test <- copy(nhanes_data)
+# match the age groups of CDC report
+nhanes_data_test[
+ , demo_age_cat := cut(demo_age_years,
+                       breaks = c(18, 39, 59, Inf),
+                       labels = c("18-39", "40-59", "60+"),
+                       include.lowest = TRUE)
+]
+
+nhanes_data_test <- nhanes_data_test %>%
+ # exclude pregnant women
+ .[demo_pregnant == 'No' | is.na(demo_pregnant)] %>%
+ # exclude participants missing both SBP and DBP
+ .[!(is.na(bp_dia_mean) & is.na(bp_sys_mean))]
+
+print(paste0("n =", nrow(nhanes_data_test)))
+
+ds <- nhanes_data_test %>%
+ nhanes_design(
+  key = nhanes_key,
+  outcome_variable = 'htn_jnc7',
+  group_variable = 'demo_age_cat',
+  time_values = '2015-2016'
+ )
+
+print(ds)
+
+ds_standard <- ds %>%
+ nhanes_design_standardize(
+  standard_variable = 'demo_age_cat',
+  standard_weights = c(0.420263, 0.357202, 0.222535)
+ )
+```
+
+```{r}
+#nhanes_summarize(nhanes_data_test, nhanes_key, outcome_variable = "demo_age_cat")
+nhanes_visualize(
+  data = nhanes_data, 
+  key = nhanes_key, 
+  outcome_variable = "bp_sys_mean",
+  outcome_stats = 'mean',
+  standard_variable = "demo_age_cat", 
+  time_values = c("2013-2014", "2015-2016", "2017-2020"), 
+  group_variable = "demo_age_cat"
+  )
+
+nhanes_htn_subpop <- nhanes_data[nhanes_data$htn_accaha == "Yes", ]
+
+nhanes_visualize(
+  data = nhanes_htn_subpop, 
+  key = nhanes_key, 
+  outcome_variable = "bp_control_accaha",
+  outcome_stats = 'percentage',
+  standard_variable = "demo_age_cat", 
+  group_variable = "demo_gender"
+  )
+```
+
+Recreating the given graphs with the nhanes_visualize() function
+
+```{r}
+nhanes_visualize(
+  data = nhanes_data, 
+  key = nhanes_key, 
+  outcome_variable = "bp_dia_mean",
+  outcome_stats = 'mean',
+  standard_variable = "demo_age_cat", 
+  group_variable = "demo_gender"
+  )
+```
