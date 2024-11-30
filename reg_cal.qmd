@@ -31,12 +31,14 @@ table(subset_nhanes$cc_diabetes)
 
 ```
 
+# Simple Regression
+
 ## Naive Analysis
 
 Before starting with regression calibration, we first want to see what a model that only uses our noisy data looks like. We'll use the same model formula as before (including age, race, smoking status etc.), the only difference being that we will use our error-full data, specifically the low reliability case.
 
 ```{r}
-naive.model=glm(cc_diabetes ~ bp_sys_mean_noise_low + demo_age_years + demo_race + demo_gender+ cc_bmi + bp_med_use, family="binomial", data=subset_nhanes)
+naive.model=glm(cc_diabetes ~ bp_sys_mean_noise_low, family="binomial", data=subset_nhanes)
 summary(naive.model)
 knitr::kable(tidy(naive.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
 ```
@@ -48,7 +50,7 @@ Looking at the summary above, the significant coefficients, and therefore the va
 Next, we'll look at our "true" model, the model which uses our unbiased, non-error blood pressure values:
 
 ```{r}
-true.model=glm(cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender+ cc_bmi +  bp_med_use, family="binomial", data=subset_nhanes)
+true.model=glm(cc_diabetes ~ bp_sys_mean, family="binomial", data=subset_nhanes)
 summary(true.model)
 knitr::kable(tidy(true.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
 ```
@@ -59,11 +61,99 @@ For this subset of the data, the true beta value for the systolic mean is ... Th
 
 ```{r}
 #Create a model with predicts the true BP value based on the noisy BP data
-rcfit<-lm(bp_sys_mean ~ bp_sys_mean_noise_low + demo_age_years + demo_race + demo_gender+ cc_bmi + bp_med_use, data=subset_nhanes)
+rcfit<-lm(bp_sys_mean ~ bp_sys_mean_noise_low, data=subset_nhanes)
 summary(rcfit)
 subset_nhanes$bp_hat <- predict(rcfit, newdata=subset_nhanes) 
 
-final.model = glm(cc_diabetes ~ bp_hat + demo_age_years + demo_race + demo_gender+ cc_bmi + cc_smoke + bp_med_use, family="binomial",data=subset_nhanes)
+final.model = glm(cc_diabetes ~ bp_hat, family="binomial",data=subset_nhanes)
+summary(final.model)
+knitr::kable(tidy(final.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
+
+```
+
+```{r}
+print(paste("Correlation between BP_noise and BP_hat:", cor(subset_nhanes$bp_sys_mean_noise_low, subset_nhanes$bp_hat)))
+```
+
+Fix Standard Errors:
+
+```{r}
+#warning = False
+set.seed(43)
+
+bootstrap.functionV2<-function(dat,inds){
+	subset_nhanes.boot<-dat[inds,]
+	rcfit.boot<-lm(bp_sys_mean ~ bp_sys_mean_noise_low, data=subset_nhanes.boot)
+	subset_nhanes.boot$bp_hat<-predict(rcfit.boot,newdata=subset_nhanes.boot)
+	final.model= glm(cc_diabetes ~ bp_hat, family="binomial", data=subset_nhanes.boot)
+	return(final.model$coef)
+}
+
+my.boot<-boot(subset_nhanes, bootstrap.functionV2, R=500)
+bsSD <- apply(my.boot$t,2,sd)
+bsSD
+
+t.stat<-coef(final.model)/bsSD
+t.stat
+```
+
+Now we can recalculate the p value for the bp_hat intercept using the t statistic calculated above. We can do this using the pt() function, which returns a p value based on a t statistic and degrees of freedom.
+
+Since our alternative hypothesis in this case is \_\_\_\_ we set the lower.tail parameter to **false**?.
+
+```{r}
+p.value.bp <- 2 * (1 - pnorm(t.stat['bp_hat']))
+print(p.value.bp)
+```
+
+Here, while we don't recover a significant p value, we do have a lower p value compared to the naive analysis (0.055 vs 0.067). Therefore, we are more confident in our conclusion that blood pressure has a correlation to diabetes risk. In this case, we can interpret the results that for one additional unit increase in systolic blood pressure, the estimated risk of having diabetes increases by 3.3%.
+
+We can also recalculate the confidence intervals: using the log odds value for the bp_hat intercept 1.033 and the recalculated standard errors, we can perform a simple calculation to construct the confidence interval at a level of 95%.
+
+```{r}
+conf.low <- 1.033 - 1.96*0.01666782
+conf.high <- 1.033 + 1.96*0.01666782
+conf.low
+conf.high
+```
+
+We see that the confidence interval does not cover 1, indicating that there is a strong evidence that a positive correlation between blood pressure and diabetes exists with a 95% confidence level.
+
+# Selected Model Regression
+
+## Naive Analysis
+
+Before starting with regression calibration, we first want to see what a model that only uses our noisy data looks like. We'll use the same model formula as before (including age, race, smoking status etc.), the only difference being that we will use our error-full data, specifically the low reliability case.
+
+```{r}
+naive.model=glm(cc_diabetes ~ bp_sys_mean_noise_low + demo_age_years + demo_gender + demo_race + cc_bmi + bp_med_use, family="binomial", data=subset_nhanes)
+summary(naive.model)
+knitr::kable(tidy(naive.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
+```
+
+Looking at the summary above, the significant coefficients, and therefore the variables which the model finds most useful in diabetes status prediction, are age, Non-Hispanic Black racial status, and BMI status, specifically for those in the 25 to 30 range. Note that our p value for our blood pressure variable is quite high, showing non-significance in the model.
+
+## Gold Standard Analysis
+
+Next, we'll look at our "true" model, the model which uses our unbiased, non-error blood pressure values:
+
+```{r}
+true.model=glm(cc_diabetes ~ bp_sys_mean + demo_age_years + demo_gender + demo_race + cc_bmi + bp_med_use, family="binomial", data=subset_nhanes)
+summary(true.model)
+knitr::kable(tidy(true.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
+```
+
+For this subset of the data, the true beta value for the systolic mean is ... This is much higher than the model which we looked at previously, using all \~50,000 subjects, although it is to be expected since we restricted the data to n=150 samples. Also notice that the significance level
+
+## Regression Calibration
+
+```{r}
+#Create a model with predicts the true BP value based on the noisy BP data
+rcfit<-lm(bp_sys_mean ~ bp_sys_mean_noise_low + demo_age_years + demo_gender + demo_race + cc_bmi + bp_med_use, data=subset_nhanes)
+summary(rcfit)
+subset_nhanes$bp_hat <- predict(rcfit, newdata=subset_nhanes) 
+
+final.model = glm(cc_diabetes ~ bp_hat + demo_age_years + demo_gender + demo_race + cc_bmi + bp_med_use, family="binomial",data=subset_nhanes)
 summary(final.model)
 knitr::kable(tidy(final.model, exponentiate = TRUE, conf.int = TRUE), digits = 3)
 
@@ -82,20 +172,32 @@ Fix Standard Errors:
 
 ```{r}
 #warning = False
-set.seed(14)
+set.seed(43)
 
 bootstrap.functionV2<-function(dat,inds){
 	subset_nhanes.boot<-dat[inds,]
-	rcfit.boot<-lm(bp_sys_mean ~ bp_sys_mean_noise_low, data=subset_nhanes.boot)
+	rcfit.boot<-lm(bp_sys_mean ~ bp_sys_mean_noise_low + demo_age_years + demo_gender + demo_race + cc_bmi + bp_med_use, data=subset_nhanes.boot)
 	subset_nhanes.boot$bp_hat<-predict(rcfit.boot,newdata=subset_nhanes.boot)
 	final.model= glm(cc_diabetes ~ bp_hat, family="binomial", data=subset_nhanes.boot)
 	return(final.model$coef)
 }
 
-my.boot<-boot(subset_nhanes, bootstrap.functionV2, R=2000)
+my.boot<-boot(subset_nhanes, bootstrap.functionV2, R=500)
 bsSD <- apply(my.boot$t,2,sd)
 bsSD
 
 t.stat<-coef(final.model)/bsSD
 t.stat
+```
+
+```{r}
+p.value.bp <- 2 * (1 - pnorm(t.stat['bp_hat']))
+print(p.value.bp)
+```
+
+```{r}
+conf.low <- 1.015 - 1.96*0.01331138
+conf.high <- 1.015 + 1.96*0.01331138
+conf.low
+conf.high
 ```

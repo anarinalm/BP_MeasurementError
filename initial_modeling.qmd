@@ -195,7 +195,7 @@ used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo
 clean_subset <- subset_nhanes[,..used_vars]
 clean_subset
 
-simple_diab_model_subset <- glm(cc_diabetes ~ bp_sys_mean, data = clean_subset, family = binomial)
+simple_diab_model_subset <- glm(cc_diabetes ~ bp_sys_mean , data = clean_subset, family = binomial)
 
 summary(simple_diab_model_subset)
 knitr::kable(tidy(simple_diab_model_subset, exponentiate = TRUE, conf.int = TRUE), digits = 3)

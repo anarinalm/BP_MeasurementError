@@ -115,6 +115,18 @@ nhanes_data %>% drop_na(cc_ckd) %>%
     ) +
     ggtitle("Blood Pressure VS Chronic Kidney Disease Status") +
     xlab("")
+
+nhanes_data %>% drop_na(cc_diabetes) %>%
+  ggplot(aes(x=cc_diabetes, y=bp_sys_mean, fill=cc_diabetes)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Diabetes") +
+    xlab("")
 ```
 
 ### Comorbidities Histograms (Blood Pressure vs Covariate)
