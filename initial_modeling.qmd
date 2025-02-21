@@ -193,7 +193,7 @@ The most basic model possible is a simple logistic regression model predicting d
 #to prevent errors, exclude the rows with na:
 used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo_gender', 'cc_bmi', 'cc_smoke', 'bp_med_use')
 clean_subset <- subset_nhanes[,..used_vars]
-clean_subset
+head(clean_subset)
 
 simple_diab_model_subset <- glm(cc_diabetes ~ bp_sys_mean , data = clean_subset, family = binomial)
 

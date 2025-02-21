@@ -11,12 +11,12 @@ book:
   chapters:
     - index.qmd
     - intro.qmd
-    - summary.qmd
+#    - summary.qmd
     - visualization.qmd
     - initial_modeling.qmd
     - diagnostics.qmd
     - add_noise.qmd
-#    - reg_cal.qmd
+    - reg_cal.qmd
     - references.qmd
 
 bibliography: references.bib
