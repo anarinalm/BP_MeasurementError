@@ -1,0 +1,438 @@
+# Data Visualization
+
+
+```{r message = FALSE, warning = FALSE}
+
+library(dplyr)
+library(tidyverse)
+library(gtsummary)
+library(tibble)
+library(ggplot2)
+library(data.table)
+library(DT)
+library(broom)
+library(devtools)
+library(viridis)
+library(knitr)
+library(hrbrthemes)
+library(car)
+#using data specified in this github repository:
+install_github("jhs-hwg/cardioStatsUSA")
+library(cardioStatsUSA)
+```
+
+```{r}
+head(nhanes_data)
+print(nrow(nhanes_data))
+print(nrow(nhanes_data[svy_subpop_htn == 1]))
+```
+
+
+## Descriptive Graphs
+
+### Demographic Histograms (Blood Pressure vs Demographic Variables)
+
+Systolic vs Age and Systolic vs Gender are very clear
+
+
+```{r}
+nhanes_data %>% drop_na(bp_dia_mean) %>%
+  ggplot(aes(x=bp_dia_mean, color=demo_age_cat)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Diastolic) with Age")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_age_cat)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Systolic) with Age")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_race)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Systolic) with Race")
+
+nhanes_data %>% drop_na(bp_sys_mean) %>%
+  ggplot(aes(x=bp_sys_mean, color=demo_gender)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Systolic) with Gender")
+
+nhanes_female <- nhanes_data[nhanes_data$demo_gender == "Women", ]
+nhanes_female %>% drop_na(demo_pregnant) %>% 
+    ggplot(aes(x=bp_sys_mean, color=demo_pregnant)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Systolic) with Pregnancy (Men Excluded)")
+
+nhanes_female %>% drop_na(demo_pregnant) %>% 
+    ggplot(aes(x=bp_dia_mean, color=demo_pregnant)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure (Diastolic) with Pregnancy (Men Excluded)")
+```
+
+
+### Comorbidities Box Plots (Blood Pressure vs Covariate)
+
+
+```{r}
+nhanes_data %>% drop_na(cc_smoke) %>%
+  ggplot(aes(x=cc_smoke, y=bp_sys_mean, fill=cc_smoke)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Smoking Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_bmi) %>%
+  ggplot(aes(x=cc_bmi, y=bp_sys_mean, fill=cc_bmi)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS BMI Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_cvd_chd) %>%
+  ggplot(aes(x=cc_cvd_chd, y=bp_sys_mean, fill=cc_cvd_chd)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Chronic Heart Disease Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_ckd) %>%
+  ggplot(aes(x=cc_ckd, y=bp_sys_mean, fill=cc_ckd)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Chronic Kidney Disease Status") +
+    xlab("")
+
+nhanes_data %>% drop_na(cc_diabetes) %>%
+  ggplot(aes(x=cc_diabetes, y=bp_sys_mean, fill=cc_diabetes)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Blood Pressure VS Diabetes") +
+    xlab("")
+```
+
+
+### Comorbidities Histograms (Blood Pressure vs Covariate)
+
+
+```{r}
+nhanes_data %>% drop_na(cc_smoke) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_smoke)) +
+    geom_histogram(fill="white", alpha=0.5, bins= 80) +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    ggtitle("Blood Pressure with Smoking Histogram")
+
+nhanes_data %>% drop_na(cc_bmi) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_bmi)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with BMI Histogram")
+
+nhanes_data %>% drop_na(cc_cvd_stroke) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_cvd_stroke)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Stroke Histogram")
+
+nhanes_data %>% drop_na(cc_diabetes) %>%
+  ggplot(aes(x=bp_sys_mean, color=cc_diabetes)) +
+    geom_histogram(fill="white", alpha=0.5, bins = 80) +
+    ggtitle("Blood Pressure with Diabetes Histogram")
+```
+
+
+### Chi Squared Tests (Testing difference between covariates and hypertension status)
+
+I realize this isn't very useful (of course the result will be significant) but I left them in anyways
+
+
+```{r}
+#Body Mass Index
+nhanes_bmi_df <- nhanes_data %>% select(htn_accaha, cc_bmi) %>% drop_na(cc_bmi)
+nhanes_bmi_df <- table(nhanes_bmi_df$htn_accaha, nhanes_bmi_df$cc_bmi)
+chisq.test(nhanes_bmi_df)
+
+#Smoking 
+nhanes_smoke_df <- nhanes_data %>% select(htn_accaha, cc_smoke) %>% drop_na(cc_smoke)
+nhanes_smoke_df <- table(nhanes_smoke_df$htn_accaha, nhanes_smoke_df$cc_smoke)
+chisq.test(nhanes_smoke_df)
+
+#Chronic Heart Disease
+nhanes_chd_df <- nhanes_data %>% select(htn_accaha, cc_cvd_chd) %>% drop_na(cc_cvd_chd)
+nhanes_chd_df <- table(nhanes_chd_df$htn_accaha, nhanes_chd_df$cc_cvd_chd)
+chisq.test(nhanes_chd_df)
+
+#Chronic Kidney Disease
+nhanes_ckd_df <- nhanes_data %>% select(htn_accaha, cc_ckd) %>% drop_na(cc_ckd)
+nhanes_ckd_df <- table(nhanes_ckd_df$htn_accaha, nhanes_ckd_df$cc_ckd)
+chisq.test(nhanes_ckd_df)
+```
+
+
+### Two Sample T Tests
+
+(Testing the Difference in blood pressure between comorbidities)
+
+Should I extend to demographic data?
+
+
+```{r}
+#Don't know if this is the idea but:
+nhanes_dia_df <- nhanes_data %>% select(htn_accaha, bp_dia_mean) %>% drop_na(bp_dia_mean)
+t_test <- t.test(bp_dia_mean ~ htn_accaha, data=nhanes_dia_df)
+t_test
+
+#Smoking T Test (Excludes Former):
+nhanes_sys_smoke <- nhanes_data[nhanes_data$cc_smoke != "Former", ] %>% select(cc_smoke, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_smoke)
+smoke_test <- t.test(bp_sys_mean ~ cc_smoke, data = nhanes_sys_smoke)
+smoke_test
+
+#BMI T Test (Compares <25 and 35+):
+nhanes_sys_bmi <- nhanes_data[nhanes_data$cc_bmi %in% c("<25", "35+"), ] %>% select(cc_bmi, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_bmi)
+bmi_test <- t.test(bp_sys_mean ~ cc_bmi, data = nhanes_sys_bmi)
+bmi_test
+
+#Diabetes T Test:
+nhanes_sys_diabetes <- nhanes_data %>% select(cc_diabetes, bp_sys_mean) %>% drop_na(bp_sys_mean) %>% drop_na(cc_diabetes)
+diabetes_test <- t.test(bp_sys_mean ~ cc_diabetes, data = nhanes_sys_diabetes)
+diabetes_test
+```
+
+
+## Simple Diabetes Modeling
+
+We are choosing Diabetes as the co-morbidity for modeling. We will try to predict the occurrence of diabetes as a function of blood pressure as well as other covariates.
+
+The most basic model possible is a simple logistic regression model predicting diabetes status based on blood pressure:
+
+
+```{r}
+simple_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean, data = nhanes_data, family = binomial)
+
+summary(simple_diab_model_sys)
+knitr::kable(tidy(simple_diab_model_sys, exponentiate = TRUE, conf.int = TRUE))
+
+simple_diab_model_dia <- glm(cc_diabetes ~ bp_dia_mean, data = nhanes_data, family = binomial)
+
+summary(simple_diab_model_dia)
+knitr::kable(tidy(simple_diab_model_dia, exponentiate = TRUE, conf.int = TRUE))
+```
+
+
+#### Model Explanation:
+
+For the logistic regression using systolic blood pressure, we can see that the odds ratio beta parameter is 1.024. This implies that a higher systolic blood pressure corresponds to increased chances of observing diabetes.
+
+A more exact interpretation would be that: for one additional unit increase in systolic blood pressure, the estimated risk of having diabetes increases by 2.4%.
+
+This value may not seem extremely high, yet it still has a p value evaluated to be 0 by R. We can also see that the 95% confidence interval of this parameter ranges between 1.0229 and 1.0253, meaning that the model predicts that the true relationship falls within this interval with a 95% certainty, since the true value of the parameter is most likely within this interval.
+
+The opposite is true with diastolic blood pressure: the beta parameter is 0.996, implying that higher diastolic blood pressure corresponds to a lower chance of observing diabetes. For an additional unit increase in diastolic blood pressure, the estimated risk of having diabetes decreases by 0.04%.
+
+Note: systolic blood pressure is a better predictor of cardiovascular disease, so I chose to consider systolic rather than diastolic in future models.
+
+## Demographic Model
+
+Next, we build a model including the demographic variables as well. This will hopefully provide a more accurate model, since it will have access to the further information in order to make predictions.
+
+
+```{r}
+demo_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender,data = nhanes_data, family = binomial)
+
+summary (demo_diab_model_sys)
+knitr::kable(tidy(demo_diab_model_sys, exponentiate = TRUE, conf.int = TRUE))
+```
+
+
+#### Model Explanation
+
+In this model, we can still see a slight upwards trend with systolic blood pressure, although it is a bit weaker (1.024 \> 1.003). With this parameter, the estimated risk of having diabetes increases only by 0.3%. Although the effect is smaller, we can see that the confidence interval is between 1.0024 and 1.0051, which does not include 1. So, although small, the positive relationship is most likely significant.
+
+#### Demographics
+
+**Age:**
+
+The model also tells us that age is positively correlated with the observation of diabetes. With a log odds ratio of 1.054, it seems that every year increases the risk of diabetes occurrence by 5.4%.
+
+**Race:**
+
+The log odds ratio for categorical variables compares the other variables to the baseline "reference group". Here, the "reference group" for the race variable is Non-Hispanic White. We can see that, in comparison to this group, all other races have significantly higher risk of diabetes: for example, the Hispanic population's risk of diabetes occurrence is 2.36 times higher than the Non-Hispanic White population.
+
+**Gender:**
+
+With this variable, the reference group is men. We can see that women have a lower odds of having diabetes compared to men. Specifically, the risk of diabetes in women is about 85.6% of in men.
+
+## Full Model
+
+Lastly, we want to create a model including confounding variables. To achieve this, we must first determine which other variables are confounding, meaning they have significant associations with diabetes.
+
+We can achieve this by using chi squared test, which compares whether or not the observed ratios of diabetes and confounding variables matches the ratios expected by random chance. If the chi squared test determines significance, then diabetes and the other variables commonly occur together and therefore are confounding.
+
+#### Perform Chi Squared Tests:
+
+
+```{r}
+#Testing for BMI
+nhanes_bmi_diab <- nhanes_data %>% select(cc_diabetes, cc_bmi) %>% drop_na(cc_bmi) %>% drop_na(cc_diabetes)
+nhanes_bmi_diab <- table(nhanes_bmi_diab)
+nhanes_bmi_diab
+chisq.test(nhanes_bmi_df)
+
+#Testing for Smoking
+nhanes_smoke_diab <- nhanes_data %>% select(cc_diabetes, cc_smoke) %>% drop_na(cc_smoke) %>% drop_na(cc_diabetes)
+nhanes_smoke_diab <- table(nhanes_smoke_diab)
+nhanes_smoke_diab
+chisq.test(nhanes_smoke_diab)
+
+#Testing for Hypertensive Medication use
+nhanes_med_diab <- nhanes_data %>% select(cc_diabetes, bp_med_use) %>% drop_na(bp_med_use) %>% drop_na(cc_diabetes)
+nhanes_med_diab <- table(nhanes_med_diab)
+nhanes_med_diab
+chisq.test(nhanes_med_diab)
+```
+
+
+After this analysis, we can see that all three variables, BMI, Smoking, and Medication Use, are all confounding. We can include all of them in the next model, in addition to systolic blood pressure and the demographic variables:
+
+
+```{r}
+#to prevent errors down the line, exclude the rows with na:
+used_vars = c('cc_diabetes', 'bp_sys_mean', 'demo_age_years', 'demo_race', 'demo_gender', 'cc_bmi', 'cc_smoke', 'bp_med_use')
+clean_nhanes <- nhanes_data[complete.cases(nhanes_data[,..used_vars]), ]
+
+full_diab_model_sys <- glm(cc_diabetes ~ bp_sys_mean + demo_age_years + demo_race + demo_gender+ cc_bmi + cc_smoke + bp_med_use, data = clean_nhanes, family = binomial)
+
+summary(full_diab_model_sys)
+knitr::kable(tidy(full_diab_model_sys, exponentiate = TRUE, conf.int = TRUE))
+```
+
+
+#### Model Explanation
+
+The previous variables in this model continue to show the same patterns, although again, the effect of systolic blood pressure is again reduced due to a lower log odds ratio. Now, the p value seems to be much higher at 0.02 (which is still significant, but much less so). The demographic variables also have much the same pattern, although Non-Hispanic Asians seem to have a much higher odds ratio than in the previous model.
+
+#### Covariates
+
+**BMI**:
+
+In this variable, the baseline reference level is bmi \<25. In comparison, those with higher bmi have increased risk of having diabetes, with the risk increasing the higher the bmi becomes. For example, those with bmi from 25-30 have a 1.8 times higher risk, while those with a bmi of 35+ have a 5.8 times higher risk.
+
+**Smoking:**
+
+With a baseline level of nonsmoking, former smokers may have about a 6% higher risk of diabetes. This may not be significant, however, given that the p value is only 0.067 and the odds ratio of 1 falls within the confidence interval. Current smokers, on the other hand, have about a 20% higher risk, this time with a much lower p value of 4\*10\^-6
+
+**Blood Pressure Medication Use**:
+
+Compared to those who do not use blood pressure medication, individuals who do have about a 2.5 times higher risk of experiencing diabetes.
+
+## Model Selection
+
+It is possible to find an even better model by modifying which variables we include in our logistic regression model. We can achieve this using model selection, which will selectively add or subtract our explanatory variables from the model and evaluate its performance to choose the final best set of variables.
+
+Explanation of model selection and or AIC?
+
+#### Backwards Selection:
+
+
+```{r}
+backwards = step(full_diab_model_sys)
+formula(backwards)
+```
+
+
+It looks like the backwards selection model returned the same full model. In other words, removing variables does not improve its AIC, and therefore does not improve its performance.
+
+#### Forward Selection
+
+
+```{r}
+#start from a model without any predictors
+nothing <- glm(cc_diabetes ~ 1, data = clean_nhanes, family=binomial)
+summary(nothing)
+
+forwards = step(nothing,
+scope=list(lower=formula(nothing),upper=formula(full_diab_model_sys)), direction="forward")
+```
+
+
+The Forward Selection process again selects the full model.
+
+
+```{r}
+bothways = step(nothing, list(lower=formula(nothing),upper=formula(full_diab_model_sys)),
+direction="both",trace=0)
+formula(bothways)
+```
+
+
+The Forward-Backward algorithm also selects all of the variables
+
+## Model Diagnostics
+
+I followed a guide online but I don't really know what this is doing:
+
+
+```{r}
+clean_nhanes %>% 
+  mutate(comp_res = coef(full_diab_model_sys)["demo_age_years"]*demo_age_years + residuals(full_diab_model_sys, type = "working")) %>% 
+  ggplot(aes(x = demo_age_years, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F)
+
+clean_nhanes %>% 
+  mutate(comp_res = coef(full_diab_model_sys)["bp_sys_mean"]*bp_sys_mean + residuals(full_diab_model_sys, type = "working")) %>% 
+  ggplot(aes(x = bp_sys_mean, y = comp_res)) +
+  geom_point() +
+  geom_smooth(color = "red", method = "lm", linetype = 2, se = F) +
+  geom_smooth(se = F)
+```
+
+
+Test for Multicollinearity
+
+
+```{r}
+vif(full_diab_model_sys)
+```
+
+
+Outliers
+
+
+```{r}
+outlier_nhanes <-
+  clean_nhanes %>% 
+  mutate(dffits = dffits(full_diab_model_sys))
+
+outlier_nhanes %>% 
+  mutate(obs_number = row_number(),
+         large = ifelse(abs(dffits) > 2*sqrt(length(coef(full_diab_model_sys))/nobs(full_diab_model_sys)),
+                        "red", "black")) %>% 
+  ggplot(aes(obs_number, dffits, color = large)) +
+  geom_point() + 
+  geom_hline(yintercept = c(-1,1) * 2*sqrt(length(coef(full_diab_model_sys))/nobs(full_diab_model_sys)), color = "red") +
+  scale_color_identity()
+```
+

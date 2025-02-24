@@ -9,7 +9,7 @@ book:
   author: "Avery Maytin, Anarina Murillo"
   date: "Last Updated February 2025"
   chapters:
-#    - index.qmd
+    - index.qmd
     - intro.qmd
 #    - summary.qmd
     - visualization.qmd
