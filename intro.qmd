@@ -1,7 +1,5 @@
 # Introduction
 
-This tutorial is still undergoing construction (last updated February 2025)
-
 ## Learning Objectives
 
 1.  To understand what measurement error is.
@@ -14,4 +12,3 @@ This tutorial is still undergoing construction (last updated February 2025)
 
 ## Overall Goal
 
-To reduce bias in statistical analyses in blood pressure measures.
