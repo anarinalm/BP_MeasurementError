@@ -5,7 +5,11 @@ project:
 
 book:
   page-navigation: true
+  title: "Tutorial of Measurement Error Methods for Evaluating Blood Pressure using NHANES Data"
+  author: "Avery Maytin, Anarina Murillo"
+  date: "Last Updated February 2025"
   chapters:
+#    - index.qmd
     - intro.qmd
 #    - summary.qmd
     - visualization.qmd
