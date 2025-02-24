@@ -12,3 +12,4 @@
 
 ## Overall Goal
 
+To reduce bias in statistical analyses in blood pressure measures.
